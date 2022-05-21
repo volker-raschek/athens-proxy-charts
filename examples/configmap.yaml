@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-configs
+data:
+  sshconfig: |
+    Host github.com
+      IdentifyFile /root/.ssh/id_ed25519
+      StrictHostKeyChecking no
+  gitconfig: |
+    [url "git@github.com:"]
+      insteadOf = https://github.com/

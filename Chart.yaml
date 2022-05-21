@@ -1,0 +1,22 @@
+apiVersion: v2
+name: athens-proxy
+description: Athens proxy server for golang
+type: application
+version: "0.1.0"
+appVersion: "0.11.0"
+icon: https://github.com/gomods/athens/blob/main/docs/static/banner.png?raw=true
+
+keywords:
+- golang
+- athens
+- gomod
+- go-proxy
+
+sources:
+- https://github.com/volker-raschek/athens-proxy-charts
+- https://github.com/gomods/athens
+- https://hub.docker.com/r/gomods/athens
+
+maintainers:
+- name: Markus Pesch
+  email: markus.pesch+apps@cryptic.systems
