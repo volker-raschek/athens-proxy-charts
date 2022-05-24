@@ -38,7 +38,7 @@ metadata:
 data:
   sshconfig: |
     Host github.com
-      IdentifyFile /root/.ssh/id_ed25519
+      IdentityFile /root/.ssh/id_ed25519
       StrictHostKeyChecking no
   gitconfig: |
     [url "git@github.com:"]

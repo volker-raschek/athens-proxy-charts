@@ -80,4 +80,4 @@ trigger:
   event:
   - tag
   repo:
-  - volker.raschek/drone-charts
+  - volker.raschek/athens-proxy-charts
