@@ -8,7 +8,7 @@
     {
       "addLabels": [ "renovate/athens-proxy", "renovate/automerge" ],
       "automerge": true,
-      "matchManagers": "drone",
+      "matchManagers": "droneci",
       "matchUpdateTypes": [ "minor", "patch"]
     },
     {
