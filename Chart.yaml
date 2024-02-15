@@ -3,7 +3,7 @@ name: athens-proxy
 description: Athens proxy server for golang
 type: application
 version: "0.1.0"
-appVersion: "v0.13.0"
+appVersion: "v0.13.1"
 icon: https://github.com/gomods/athens/blob/main/docs/static/banner.png?raw=true
 
 keywords:
