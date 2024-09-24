@@ -102,6 +102,12 @@ config: {}
   # MY_S3_BUCKET_NAME:
   # PROXY_FORCE_SSL:
 
+livenessProbe:
+  httpGet:
+    scheme: HTTP
+    path: /healthz
+    port: http
+
 replicaCount: 1
 
 serviceAccount:
@@ -136,6 +142,12 @@ ingress:
   - secretName: "your-tls-secret"
     hosts:
     - "your-hostname"
+
+readinessProbe:
+  httpGet:
+    scheme: HTTP
+    path: /healthz
+    port: http
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

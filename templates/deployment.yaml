@@ -26,20 +26,18 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.livenessProbe }}
           livenessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /healthz
-              port: http
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
           - name: http
             containerPort: {{ .Values.config.ATHENS_PORT | default 3000 }}
             protocol: TCP
+          {{- with .Values.readinessProbe }}
           readinessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /healthz
-              port: http
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.extraVolumeMounts }}
