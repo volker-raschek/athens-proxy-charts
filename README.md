@@ -1,6 +1,5 @@
 # athens-proxy-charts
 
-[![Build Status](https://drone.cryptic.systems/api/badges/volker.raschek/athens-proxy-charts/status.svg)](https://drone.cryptic.systems/volker.raschek/athens-proxy-charts)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/volker-raschek)](https://artifacthub.io/packages/search?repo=volker-raschek)
 
 This is an inofficial helm chart of the go-proxy
