@@ -2,6 +2,7 @@
 # This supports shell glob matching, relative path matching, and
 # negation (prefixed with !). Only one pattern per line.
 .DS_Store
+
 # Common VCS dirs
 .git/
 .gitignore
@@ -10,23 +11,50 @@
 .hg/
 .hgignore
 .svn/
+
 # Common backup files
 *.swp
 *.bak
 *.tmp
 *.orig
 *~
+
 # Various IDEs
 .project
 .idea/
 *.tmproj
 .vscode/
+
 # drone
 .drone.yml
-# markdownlint
-.markdownlint.yaml
+
+# editorconfig
+.editorconfig
+
 # customized values
 values2.yml
 values2.yaml
+
 # helm packages
 *.tgz
+.helmignore
+unittests
+
+# markdownlint
+.markdownlint.yml
+.markdownlint.yaml
+.markdownlintignore
+
+# npm
+.prettierignore
+.npmrc
+package*
+
+# yamllint
+.yamllint.yaml
+
+# Others
+CONTRIBUTING.md
+CODEOWNERS
+Makefile
+renovate.json

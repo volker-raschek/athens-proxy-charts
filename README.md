@@ -25,7 +25,7 @@ below or via mounting the config.toml as additional persistent volume to
 
 Create a `configmap.yaml` with multiple keys. One key describe the content of
 the `.gitconfig` file and another of `config` of the ssh client. All requests
-git clone comands with the prefix `http://github.com/` will be replaced by
+Git clone comands with the prefix `http://github.com/` will be replaced by
 `git@github.com:` to use SSH instead of HTTPS. The SSH keys are stored in a
 separate secret.
 
@@ -103,11 +103,11 @@ extraVolumeMounts:
   mountPath: /root/.config/git
 ```
 
-## Access private github.com repositories via developer token
+## Access private GitHub.com repositories via developer token
 
-Another way to access private github repositories is via a github token, which
+Another way to access private GitHub repositories is via a GitHub token, which
 can be set via the environment variable `GITHUB_TOKEN`. Athens automatically
-creates a `.netrc` file to access private github repositories.
+creates a `.netrc` file to access private GitHub repositories.
 
 ## Access private repositories via .netrc configuration
 
@@ -116,7 +116,7 @@ HTTP. The file can also be defined via a custom secret and mounted into the home
 directory of `root` for general authentication purpose.
 
 The example below describe the definition and mounting of a custom `.netrc` file
-to access private repositories hosted on github and gitlab.
+to access private repositories hosted on GitHub and GitLab.
 
 ```yaml
 apiVersion: v1
@@ -164,3 +164,5 @@ extraVolumeMounts:
 - name: gomodules
   mountPath: /var/lib/athens
 ```
+
+## Parameters
