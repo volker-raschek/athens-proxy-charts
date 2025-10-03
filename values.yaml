@@ -127,26 +127,38 @@ config:
         # }
 
   gitConfig:
-    ## @param config.gitConfig.existingConfigMap.enabled TODO:
-    ## @param config.gitConfig.existingConfigMap.secretName TODO:
+    ## @param config.gitConfig.enabled Enable mounting of a .gitconfig file into the container file system.
+    enabled: false
+
+    ## @param config.gitConfig.existingConfigMap.enabled Enable to use an external config map for mounting the .gitconfig file.
+    ## @param config.gitConfig.existingConfigMap.configMapName The name of the existing config map which should be used to mount the .gitconfig file.
+    ## @param config.gitConfig.existingConfigMap.gitConfigKey The name of the key inside the config map where the content of the .gitconfig file is stored.
     existingConfigMap:
       enabled: false
       secretName: ""
+      gitConfigKey:
 
     ## @param config.gitConfig.configMap.annotations Additional annotations of the config map containing the download mode file.
     ## @param config.gitConfig.configMap.labels Additional labels of the config map containing the download mode file.
-    ## @param config.gitConfig.configMap.content TODO:
+    ## @param config.gitConfig.configMap.content The content of the .gitconfig file.
     configMap:
       annotations: {}
       labels: {}
       content: |
+        # The .gitconfig file
+        #
+        # The .gitconfig file contains the user specific git configuration. It generally resides in the user's home
+        # directory.
+        #
+        # [url "git@github.com:"] insteadOf = https://github.com/
 
   netrc:
     ## @param config.netrc.enabled Enable mounting of a .netrc file into the container file system.
     enabled: false
 
-    ## @param config.netrc.existingSecret.enabled TODO:.
-    ## @param config.netrc.existingSecret.secretName TODO:
+    ## @param config.netrc.existingSecret.enabled Enable to use an external secret for mounting the .netrc file.
+    ## @param config.netrc.existingSecret.secretName The name of the existing secret which should be used to mount the .netrc file.
+    ## @param config.netrc.existingSecret.netrcKey The name of the key inside the secret where the content of the .netrc file is stored.
     existingSecret:
       enabled: false
       secretName: ""
@@ -154,7 +166,7 @@ config:
 
     ## @param config.netrc.secret.annotations Additional annotations of the secret containing the database credentials.
     ## @param config.netrc.secret.labels Additional labels of the secret containing the database credentials.
-    ## @param config.netrc.secret.content TODO:
+    ## @param config.netrc.secret.content The content of the .netrc file.
     secret:
       annotations: {}
       labels: {}
