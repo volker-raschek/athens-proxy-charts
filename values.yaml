@@ -62,7 +62,6 @@ config:
         # ATHENS_MONGO_DEFAULT_DATABASE:
         # ATHENS_MONGO_INSECURE:
         # ATHENS_MONGO_STORAGE_URL:
-        # ATHENS_NETRC_PATH:
         # ATHENS_PATH_PREFIX:
         # ATHENS_PORT:
         # ATHENS_PROTOCOL_WORKERS:
@@ -75,7 +74,6 @@ config:
         # ATHENS_STATS_EXPORTER:
         # ATHENS_STORAGE_GCP_BUCKET:
         # ATHENS_STORAGE_GCP_JSON_KEY:
-        # ATHENS_STORAGE_TYPE:
         # ATHENS_SUM_DBS:
         # ATHENS_TIMEOUT:
         # ATHENS_TLSCERT_FILE:
@@ -144,11 +142,15 @@ config:
       content: |
 
   netrc:
+    ## @param config.netrc.enabled Enable mounting of a .netrc file into the container file system.
+    enabled: false
+
     ## @param config.netrc.existingSecret.enabled TODO:.
     ## @param config.netrc.existingSecret.secretName TODO:
     existingSecret:
       enabled: false
       secretName: ""
+      netrcKey: ".netrc"
 
     ## @param config.netrc.secret.annotations Additional annotations of the secret containing the database credentials.
     ## @param config.netrc.secret.labels Additional labels of the secret containing the database credentials.

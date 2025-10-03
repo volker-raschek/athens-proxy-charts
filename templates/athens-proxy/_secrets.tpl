@@ -45,3 +45,17 @@
 {{ toYaml .Values.config.ssh.secret.labels }}
 {{- end }}
 {{- end }}
+
+{{/* name */}}
+
+{{- define "athens-proxy.secrets.env.name" -}}
+{{ include "athens-proxy.fullname" . }}-env
+{{- end }}
+
+{{- define "athens-proxy.secrets.netrc.name" -}}
+{{ include "athens-proxy.fullname" . }}-netrc
+{{- end }}
+
+{{- define "athens-proxy.secrets.ssh.name" -}}
+{{ include "athens-proxy.fullname" . }}-ssh
+{{- end }}
