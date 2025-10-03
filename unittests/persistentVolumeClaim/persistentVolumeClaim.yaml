@@ -1,0 +1,90 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: PersistentVolumeClaim template
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/athens-proxy/persistentVolumeClaim.yaml
+tests:
+- it: Rendering default
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Rendering with enabled persistent storage
+  set:
+    persistence.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: athens-proxy-unittest-data
+      namespace: testing
+  - notExists:
+      path: metadata.annotations
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+  - equal:
+      path: spec.accessModes
+      value:
+      - ReadWriteMany
+  - isSubset:
+      path: spec.resources
+      content:
+        requests:
+          storage: 5Gi
+  - notExists:
+      path: spec.storageClassName
+
+- it: Rendering with custom enabled persistent storage
+  set:
+    persistence.enabled: true
+    persistence.data.persistentVolumeClaim.annotations:
+      foo: bar
+    persistence.data.persistentVolumeClaim.labels:
+      bar: foo
+    persistence.data.persistentVolumeClaim.storageClassName: my-storage-class
+    persistence.data.persistentVolumeClaim.storageSize: 10Gi
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: athens-proxy-unittest-data
+      namespace: testing
+  - equal:
+      path: metadata.annotations
+      value:
+        foo: bar
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        bar: foo
+        helm.sh/chart: athens-proxy-0.1.0
+  - equal:
+      path: spec.accessModes
+      value:
+      - ReadWriteMany
+  - isSubset:
+      path: spec.resources
+      content:
+        requests:
+          storage: 10Gi
+  - equal:
+      path: spec.storageClassName
+      value: my-storage-class

@@ -1,0 +1,26 @@
+{{- if and .Values.persistence.enabled (not .Values.persistence.data.existingPersistentVolumeClaim.enabled) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  {{- with (include "athens-proxy.persistentVolumeClaim.data.annotations" . | fromYaml) }}
+  annotations:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  {{- with (include "athens-proxy.persistentVolumeClaim.data.labels" . | fromYaml) }}
+  labels:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  name: {{ include "athens-proxy.persistentVolumeClaim.data.name" . }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  {{- with .Values.persistence.data.persistentVolumeClaim.accessModes }}
+  accessModes:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.data.persistentVolumeClaim.storageSize }}
+  {{- if .Values.persistence.data.persistentVolumeClaim.storageClassName }}
+  storageClassName: {{ .Values.persistence.data.persistentVolumeClaim.storageClassName }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,528 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: Deployment template
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/athens-proxy/deployment.yaml
+tests:
+- it: Rendering default
+  asserts:
+  - hasDocuments:
+      count: 1
+    template: templates/athens-proxy/deployment.yaml
+  - containsDocument:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: athens-proxy-unittest
+      namespace: testing
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: metadata.annotations
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: spec.replicas
+      value: 1
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: spec.template.metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.affinity
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.containers[0].args
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.containers[0].command
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.containers[0].envFrom
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.containers[0].volumeMounts
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].image
+      value: docker.io/gomods/athens:v0.1.0
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].imagePullPolicy
+      value: IfNotPresent
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.containers[0].resources
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.containers[0].securityContext
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.dnsConfig
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.dnsPolicy
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.hostname
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: spec.template.spec.hostNetwork
+      value: false
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.imagePullSecrets
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.nodeSelector
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.priorityClassName
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.restartPolicy
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.subdomain
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 60
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.tolerations
+    template: templates/athens-proxy/deployment.yaml
+  - notExists:
+      path: spec.template.spec.topologySpreadConstraints
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: spec.strategy
+      value:
+        type: "RollingUpdate"
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 1
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test custom replicas
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.replicas: 3
+  asserts:
+  - equal:
+      path: spec.replicas
+      value: 3
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test custom affinity
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: topology.kubernetes.io/zone
+              operator: In
+              values:
+              - antarctica-east1
+              - antarctica-west1
+  asserts:
+  - equal:
+      path: spec.template.spec.affinity
+      value:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - antarctica-east1
+                - antarctica-west1
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test additional arguments
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.athensProxy.args:
+    - "--foo=bar"
+    - "--bar=foo"
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].args
+      value:
+      - --foo=bar
+      - --bar=foo
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test additional command
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.athensProxy.command:
+    - "/bin/sh"
+    - "-c"
+    - "echo hello"
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].command
+      value:
+      - "/bin/sh"
+      - "-c"
+      - "echo hello"
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test custom imageRegistry and imageRepository
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.athensProxy.image.registry: registry.example.local
+    deployment.athensProxy.image.repository: path/special/athens-proxy
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].image
+      value: registry.example.local/path/special/athens-proxy:v0.1.0
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test custom imagePullPolicy
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.athensProxy.image.pullPolicy: Always
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].imagePullPolicy
+      value: Always
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test custom resource limits and requests
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.athensProxy.resources:
+      limits:
+        cpu: 100m
+        memory: 250MB
+      requests:
+        cpu: 25m
+        memory: 100MB
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].env
+      value:
+      - name: GOMAXPROCS
+        valueFrom:
+          resourceFieldRef:
+            divisor: "1"
+            resource: limits.cpu
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].resources
+      value:
+        limits:
+          cpu: 100m
+          memory: 250MB
+        requests:
+          cpu: 25m
+          memory: 100MB
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test custom securityContext
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.athensProxy.securityContext:
+      capabilities:
+        add:
+        - NET_RAW
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].securityContext
+      value:
+        capabilities:
+          add:
+          - NET_RAW
+          drop:
+          - ALL
+        privileged: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test dnsConfig
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.dnsConfig:
+      nameservers:
+      - "8.8.8.8"
+      - "8.8.4.4"
+  asserts:
+  - equal:
+      path: spec.template.spec.dnsConfig
+      value:
+        nameservers:
+        - "8.8.8.8"
+        - "8.8.4.4"
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test dnsPolicy
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.dnsPolicy: ClusterFirst
+  asserts:
+  - equal:
+      path: spec.template.spec.dnsPolicy
+      value: ClusterFirst
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test hostNetwork, hostname, subdomain
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.hostNetwork: true
+    deployment.hostname: pg-exporter
+    deployment.subdomain: exporters.internal
+  asserts:
+  - equal:
+      path: spec.template.spec.hostNetwork
+      value: true
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: spec.template.spec.hostname
+      value: pg-exporter
+    template: templates/athens-proxy/deployment.yaml
+  - equal:
+      path: spec.template.spec.subdomain
+      value: exporters.internal
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test imagePullSecrets
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.imagePullSecrets:
+    - name: my-pull-secret
+    - name: my-special-secret
+  asserts:
+  - equal:
+      path: spec.template.spec.imagePullSecrets
+      value:
+      - name: my-pull-secret
+      - name: my-special-secret
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test nodeSelector
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.nodeSelector:
+      foo: bar
+  asserts:
+  - equal:
+      path: spec.template.spec.nodeSelector
+      value:
+        foo: bar
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test priorityClassName
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.priorityClassName: my-priority
+  asserts:
+  - equal:
+      path: spec.template.spec.priorityClassName
+      value: my-priority
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test restartPolicy
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.restartPolicy: Always
+  asserts:
+  - equal:
+      path: spec.template.spec.restartPolicy
+      value: Always
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test terminationGracePeriodSeconds
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.terminationGracePeriodSeconds: 120
+  asserts:
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 120
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test tolerations
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.tolerations:
+    - key: database/type
+      operator: Equal
+      value: postgres
+      effect: NoSchedule
+  asserts:
+  - equal:
+      path: spec.template.spec.tolerations
+      value:
+      - key: database/type
+        operator: Equal
+        value: postgres
+        effect: NoSchedule
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test topologySpreadConstraints
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.topologySpreadConstraints:
+    - topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/instance: athens-proxy
+  asserts:
+  - equal:
+      path: spec.template.spec.topologySpreadConstraints
+      value:
+      - topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: athens-proxy
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test additional volumeMounts and volumes
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.athensProxy.volumeMounts:
+    - name: data
+      mountPath: /usr/lib/athens-proxy/data
+    deployment.volumes:
+    - name: data
+      hostPath:
+        path: /usr/lib/athens-proxy/data
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].volumeMounts
+      value:
+      - name: data
+        mountPath: /usr/lib/athens-proxy/data
+    template: templates/athens-proxy/deployment.yaml
+
+- it: Test persistent volume claim
+  set:
+    persistence.enabled: true
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_STORAGE_TYPE
+          value: disk
+      template: templates/athens-proxy/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_DISK_STORAGE_ROOT
+          value: /var/www/athens-proxy/data
+      template: templates/athens-proxy/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: data
+          mountPath: /var/www/athens-proxy/data
+      template: templates/athens-proxy/deployment.yaml
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: data
+          persistentVolumeClaim:
+            claimName: athens-proxy-unittest-data
+      template: templates/athens-proxy/deployment.yaml
+
+- it: Test existing persistent volume claim
+  set:
+    persistence.enabled: true
+    persistence.data.mountPath: "/mnt/go-proxy/data"
+    persistence.data.existingPersistentVolumeClaim.enabled: true
+    persistence.data.existingPersistentVolumeClaim.persistentVolumeClaimName: "my-special-pvc"
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_STORAGE_TYPE
+          value: disk
+      template: templates/athens-proxy/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_DISK_STORAGE_ROOT
+          value: /mnt/go-proxy/data
+      template: templates/athens-proxy/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: data
+          mountPath: /mnt/go-proxy/data
+      template: templates/athens-proxy/deployment.yaml
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: data
+          persistentVolumeClaim:
+            claimName: my-special-pvc
+      template: templates/athens-proxy/deployment.yaml

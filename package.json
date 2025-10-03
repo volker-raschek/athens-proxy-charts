@@ -1,6 +1,6 @@
 {
-  "name": "athens-proxy-chart",
-  "homepage": "https://git.cryptic.systems/volker.raschek/athens-proxy-chart.git",
+  "name": "athens-proxy-charts",
+  "homepage": "https://git.cryptic.systems/volker.raschek/athens-proxy-charts.git",
   "license": "MIT",
   "private": true,
   "engineStrict": true,

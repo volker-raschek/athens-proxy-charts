@@ -1,0 +1,116 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: HPA template (basic)
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/athens-proxy/hpa.yaml
+tests:
+- it: Skip rendering by default.
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Rendering when enabled - default
+  set:
+    hpa.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      name: athens-proxy-unittest
+      namespace: testing
+  - notExists:
+      path: metadata.annotations
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+  - contains:
+      path: spec.metrics
+      content:
+        resource:
+          name: cpu
+          target:
+            averageUtilization: 65
+            type: Utilization
+        type: Resource
+  - equal:
+      path: spec.maxReplicas
+      value: 10
+  - equal:
+      path: spec.minReplicas
+      value: 1
+  - equal:
+      path: spec.scaleTargetRef
+      value:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: athens-proxy-unittest
+
+- it: Rendering when enabled - custom values
+  set:
+    hpa.enabled: true
+    hpa.annotations:
+      foo: bar
+    hpa.labels:
+      bar: foo
+    hpa.maxReplicas: 25
+    hpa.minReplicas: 5
+    hpa.metrics:
+    - resource:
+        name: memory
+        target:
+          averageUtilization: 65
+          type: Utilization
+      type: Resource
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      name: athens-proxy-unittest
+      namespace: testing
+  - equal:
+      path: metadata.annotations
+      value:
+        foo: bar
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        bar: foo
+        helm.sh/chart: athens-proxy-0.1.0
+  - contains:
+      path: spec.metrics
+      content:
+        resource:
+          name: memory
+          target:
+            averageUtilization: 65
+            type: Utilization
+        type: Resource
+  - equal:
+      path: spec.maxReplicas
+      value: 25
+  - equal:
+      path: spec.minReplicas
+      value: 5
+  - equal:
+      path: spec.scaleTargetRef
+      value:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: athens-proxy-unittest

@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {{- with (include "athens-proxy.deployment.annotations" . | fromYaml) }}
+  annotations:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  {{- with (include "athens-proxy.deployment.labels" . | fromYaml) }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ include "athens-proxy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      {{- include "athens-proxy.pod.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- include "athens-proxy.pod.annotations" . | nindent 8 }}
+      labels:
+        {{- include "athens-proxy.pod.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.deployment.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: athens-proxy
+        {{- with .Values.deployment.athensProxy.args }}
+        args:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.deployment.athensProxy.command }}
+        command:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- $env := (include "athens-proxy.deployment.env" . | fromYaml) }}
+        {{- if and (hasKey $env "env") (gt (len $env.env) 0) }}
+        env:
+        {{- toYaml $env.env | nindent 8 }}
+        {{- end }}
+        {{- $envFrom := (include "athens-proxy.deployment.envFrom" . | fromYaml) }}
+        {{- if and (hasKey $envFrom "envFrom") (gt (len $envFrom.envFrom) 0) }}
+        envFrom:
+        {{- toYaml $envFrom.envFrom | nindent 8 }}
+        {{- end }}
+        image: {{ include "athens-proxy.deployment.images.athens-proxy.fqin" . | quote }}
+        imagePullPolicy: {{ .Values.deployment.athensProxy.image.pullPolicy }}
+        livenessProbe:
+          tcpSocket:
+            port: http
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        readinessProbe:
+          tcpSocket:
+            port: http
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 3
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        {{- with .Values.deployment.athensProxy.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.deployment.athensProxy.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- $volumeMounts := (include "athens-proxy.deployment.volumeMounts" . | fromYaml) }}
+        {{- if and (hasKey $volumeMounts "volumeMounts") (gt (len $volumeMounts.volumeMounts) 0) }}
+        volumeMounts:
+        {{- toYaml $volumeMounts.volumeMounts | nindent 8 }}
+        {{- end }}
+      {{- with .Values.deployment.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.deployment.dnsPolicy }}
+      dnsPolicy: {{ .Values.deployment.dnsPolicy }}
+      {{- end }}
+      {{- if .Values.deployment.hostname }}
+      hostname: {{ .Values.deployment.hostname }}
+      {{- end }}
+      hostNetwork: {{ .Values.deployment.hostNetwork }}
+      {{- with .Values.deployment.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.deployment.priorityClassName }}
+      priorityClassName: {{ .Values.deployment.priorityClassName }}
+      {{- end }}
+      {{- if .Values.deployment.restartPolicy }}
+      restartPolicy: {{ .Values.deployment.restartPolicy }}
+      {{- end }}
+      {{- with .Values.deployment.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccount: {{ include "athens-proxy.deployment.serviceAccount" . }}
+      {{- if .Values.deployment.subdomain }}
+      subdomain: {{ .Values.deployment.subdomain }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
+      {{- with .Values.deployment.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.deployment.topologySpreadConstraints }}
+      topologySpreadConstraints:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- $volumes := (include "athens-proxy.deployment.volumes" . | fromYaml) }}
+      {{- if and (hasKey $volumes "volumes") (gt (len $volumes.volumes) 0) }}
+      volumes:
+      {{- toYaml $volumes.volumes | nindent 6 }}
+      {{- end }}
+  {{- with .Values.deployment.strategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

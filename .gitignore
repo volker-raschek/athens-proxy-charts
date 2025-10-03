@@ -4,3 +4,6 @@ target
 values2.yml
 values2.yaml
 *.tgz
+
+install.sh
+uninstall.sh

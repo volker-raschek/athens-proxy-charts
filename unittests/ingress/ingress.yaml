@@ -1,0 +1,139 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: Ingress template
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/athens-proxy/ingress.yaml
+tests:
+- it: Skip ingress by default.
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip ingress, when service is disabled.
+  set:
+    services.http.enabled: false
+    ingress.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Render ingress with default values.
+  set:
+    ingress.enabled: true
+    ingress.hosts:
+    - host: athens-proxy.example.local
+      paths:
+      - path: /
+        pathType: Prefix
+    ingress.tls:
+    - secretName: athens-proxy-http-tls
+      hosts:
+      - athens-proxy.example.local
+
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      name: athens-proxy-unittest
+      namespace: testing
+  - notExists:
+      path: metadata.annotations
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+  - equal:
+      path: spec.ingressClassName
+      value: nginx
+  - contains:
+      path: spec.rules
+      content:
+        host: athens-proxy.example.local
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: athens-proxy-unittest-http
+                port:
+                  number: 3000
+  - contains:
+      path: spec.tls
+      content:
+        hosts:
+        - athens-proxy.example.local
+        secretName: athens-proxy-http-tls
+
+- it: Render ingress with custom values.
+  set:
+    ingress.enabled: true
+    ingress.annotations:
+      foo: bar
+    ingress.className: nginx
+    ingress.labels:
+      bar: foo
+    ingress.hosts:
+    - host: athens-proxy.example.local
+      paths:
+      - path: /
+        pathType: Prefix
+    ingress.tls:
+    - secretName: athens-proxy-http-tls
+      hosts:
+      - athens-proxy.example.local
+    services.http.port: 8080
+
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      name: athens-proxy-unittest
+      namespace: testing
+  - equal:
+      path: metadata.annotations
+      value:
+        foo: bar
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+        bar: foo
+  - equal:
+      path: spec.ingressClassName
+      value: nginx
+  - contains:
+      path: spec.rules
+      content:
+        host: athens-proxy.example.local
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: athens-proxy-unittest-http
+                port:
+                  number: 8080
+  - contains:
+      path: spec.tls
+      content:
+        hosts:
+        - athens-proxy.example.local
+        secretName: athens-proxy-http-tls

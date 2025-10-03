@@ -1,0 +1,19 @@
+{{- if not .Values.config.gitConfig.existingConfigMap.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  {{- with (include "athens-proxy.configMap.gitConfig.annotations" . | fromYaml) }}
+  annotations:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  {{- with (include "athens-proxy.configMap.gitConfig.labels" . | fromYaml) }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ include "athens-proxy.fullname" . }}-git-config
+  namespace: {{ .Release.Namespace }}
+data:
+  .gitconfig: |
+    {{- tpl .Values.config.gitConfig.configMap.content . | nindent 4 }}
+{{- end }}

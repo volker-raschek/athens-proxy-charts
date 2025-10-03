@@ -1,0 +1,88 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: ConfigMap downloadMode
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/athens-proxy/configMapDownloadMode.yaml
+tests:
+- it: Skip rending by using existing config map.
+  set:
+    config.downloadMode.existingConfigMap.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Rendering by default.
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: v1
+      kind: ConfigMap
+      name: athens-proxy-unittest-download-mode-file
+      namespace: testing
+  - notExists:
+      path: metadata.annotations
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+  - equal:
+      path: data.downloadMode
+      value: |
+        # downloadURL = "https://proxy.golang.org"
+        #
+        # mode = "async_redirect"
+        #
+        # download "github.com/gomods/*" {
+        #     mode = "sync"
+        # }
+        #
+        # download "golang.org/x/*" {
+        #     mode = "none"
+        # }
+        #
+        # download "github.com/pkg/*" {
+        #     mode = "redirect"
+        #     downloadURL = "https://gocenter.io"
+        # }
+
+- it: Rendering custom annotations and labels.
+  set:
+    config.downloadMode.configMap.annotations:
+      foo: bar
+      bar: foo
+    config.downloadMode.configMap.labels:
+      foo: bar
+      bar: foo
+  asserts:
+  - equal:
+      path: metadata.annotations
+      value:
+        foo: bar
+        bar: foo
+  - isSubset:
+      path: metadata.labels
+      content:
+        foo: bar
+        bar: foo
+
+- it: Rendering custom configuration
+  set:
+    config.downloadMode.configMap.content: |
+      downloadURL = "https://proxy.golang.org"
+      mode = "async_redirect"
+
+  asserts:
+  - equal:
+      path: data.downloadMode
+      value: |
+        downloadURL = "https://proxy.golang.org"
+        mode = "async_redirect"

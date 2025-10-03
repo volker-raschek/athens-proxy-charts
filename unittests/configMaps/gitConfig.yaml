@@ -1,0 +1,77 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: ConfigMap gitConfig
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/athens-proxy/configMapGitConfig.yaml
+tests:
+- it: Skip rending by using existing config map.
+  set:
+    config.gitConfig.existingConfigMap.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Rendering by default.
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: v1
+      kind: ConfigMap
+      name: athens-proxy-unittest-git-config
+      namespace: testing
+  - notExists:
+      path: metadata.annotations
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+  - isNullOrEmpty:
+      path: data[".gitconfig"]
+
+- it: Rendering custom annotations and labels.
+  set:
+    config.gitConfig.configMap.annotations:
+      foo: bar
+      bar: foo
+    config.gitConfig.configMap.labels:
+      foo: bar
+      bar: foo
+  asserts:
+  - equal:
+      path: metadata.annotations
+      value:
+        foo: bar
+        bar: foo
+  - isSubset:
+      path: metadata.labels
+      content:
+        foo: bar
+        bar: foo
+
+- it: Rendering custom configuration
+  set:
+    config.gitConfig.configMap.content: |
+      [url "git@github.com:"]
+      insteadOf = https://github.com/
+
+      [url "git@git.cryptic.systems:"]
+      insteadOf = https://git.cryptic.systems/
+
+  asserts:
+  - equal:
+      path: data[".gitconfig"]
+      value: |
+        [url "git@github.com:"]
+        insteadOf = https://github.com/
+
+        [url "git@git.cryptic.systems:"]
+        insteadOf = https://git.cryptic.systems/

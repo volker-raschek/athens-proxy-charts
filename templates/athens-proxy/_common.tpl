@@ -1,3 +1,4 @@
+{{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
 */}}
@@ -31,19 +32,25 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
+Common annotations
+*/}}
+{{- define "athens-proxy.annotations" -}}
+{{- end }}
+
+{{/*
 Common labels
 */}}
 {{- define "athens-proxy.labels" -}}
-helm.sh/chart: {{ include "athens-proxy.chart" . }}
 {{ include "athens-proxy.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+helm.sh/chart: {{ include "athens-proxy.chart" . }}
 {{- end }}
 
 {{/*
-Selector labels
+Common selector labels
 */}}
 {{- define "athens-proxy.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "athens-proxy.name" . }}

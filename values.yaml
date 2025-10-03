@@ -1,199 +1,587 @@
-affinity: {}
-
-image:
-  repository: docker.io/gomods/athens
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-
-imagePullSecrets: []
+# Declare variables to be passed into your templates.
+## @section Global
+## @param nameOverride Individual release name suffix.
+## @param fullnameOverride Override the complete release name logic.
 nameOverride: ""
 fullnameOverride: ""
 
-podAnnotations: {}
+## @section Configuration
+config:
+  env:
+    ## @param config.env.existingSecret.enabled Mount an existing secret containing the application specific environment variables.
+    ## @param config.env.existingSecret.secretName Name of the existing secret containing the application specific environment variables.
+    existingSecret:
+      enabled: false
+      secretName: ""
 
-podPriorityClassName: ""
+    ## @param config.env.secret.annotations Additional annotations of the secret containing the database credentials.
+    ## @param config.env.secret.labels Additional labels of the secret containing the database credentials.
+    ## @param config.env.secret.envs List of environment variables stored in a secret and mounted into the container.
+    secret:
+      annotations: {}
+      labels: {}
+      envs: {}
+        # ATHENS_AZURE_ACCOUNT_KEY:
+        # ATHENS_AZURE_ACCOUNT_NAME:
+        # ATHENS_AZURE_CONTAINER_NAME:
+        # ATHENS_CLOUD_RUNTIME:
+        # ATHENS_DOWNLOAD_MODE:
+        # ATHENS_DOWNLOAD_URL:
+        # ATHENS_ETCD_ENDPOINTS:
+        # ATHENS_EXTERNAL_STORAGE_URL:
+        # ATHENS_FILTER_FILE:
+        # ATHENS_GITHUB_TOKEN:
+        # ATHENS_GLOBAL_ENDPOINT:
+        # ATHENS_GO_BINARY_ENV_VARS:
+        # ATHENS_GOGET_DIR:
+        # ATHENS_GOGET_WORKERS:
+        # ATHENS_GONOSUM_PATTERNS:
+        # ATHENS_HGRC_PATH:
+        # ATHENS_INDEX_MYSQL_DATABASE:
+        # ATHENS_INDEX_MYSQL_HOST:
+        # ATHENS_INDEX_MYSQL_PARAMS:
+        # ATHENS_INDEX_MYSQL_PASSWORD:
+        # ATHENS_INDEX_MYSQL_PORT:
+        # ATHENS_INDEX_MYSQL_PROTOCOL:
+        # ATHENS_INDEX_MYSQL_USER:
+        # ATHENS_INDEX_POSTGRES_DATABASE:
+        # ATHENS_INDEX_POSTGRES_HOST:
+        # ATHENS_INDEX_POSTGRES_PARAMS:
+        # ATHENS_INDEX_POSTGRES_PASSWORD:
+        # ATHENS_INDEX_POSTGRES_PORT:
+        # ATHENS_INDEX_POSTGRES_USER:
+        # ATHENS_INDEX_TYPE:
+        # ATHENS_LOG_LEVEL:
+        # ATHENS_MINIO_ACCESS_KEY_ID:
+        # ATHENS_MINIO_BUCKET_NAME:
+        # ATHENS_MINIO_ENDPOINT:
+        # ATHENS_MINIO_REGION:
+        # ATHENS_MINIO_SECRET_ACCESS_KEY:
+        # ATHENS_MINIO_USE_SSL:
+        # ATHENS_MONGO_CERT_PATH:
+        # ATHENS_MONGO_DEFAULT_DATABASE:
+        # ATHENS_MONGO_INSECURE:
+        # ATHENS_MONGO_STORAGE_URL:
+        # ATHENS_NETRC_PATH:
+        # ATHENS_PATH_PREFIX:
+        # ATHENS_PORT:
+        # ATHENS_PROTOCOL_WORKERS:
+        # ATHENS_PROXY_VALIDATOR:
+        # ATHENS_REDIS_ENDPOINT:
+        # ATHENS_REDIS_PASSWORD:
+        # ATHENS_REDIS_SENTINEL_ENDPOINTS:
+        # ATHENS_ROBOTS_FILE:
+        # ATHENS_SINGLE_FLIGHT_TYPE:
+        # ATHENS_STATS_EXPORTER:
+        # ATHENS_STORAGE_GCP_BUCKET:
+        # ATHENS_STORAGE_GCP_JSON_KEY:
+        # ATHENS_STORAGE_TYPE:
+        # ATHENS_SUM_DBS:
+        # ATHENS_TIMEOUT:
+        # ATHENS_TLSCERT_FILE:
+        # ATHENS_TLSKEY_FILE:
+        # ATHENS_TRACE_EXPORTER_URL:
+        # ATHENS_TRACE_EXPORTER:
+        # AWS_ACCESS_KEY_ID:
+        # AWS_ENDPOINT:
+        # AWS_FORCE_PATH_STYLE:
+        # AWS_REGION:
+        # AWS_SECRET_ACCESS_KEY:
+        # AWS_SESSION_TOKEN:
+        # BASIC_AUTH_PASS:
+        # BASIC_AUTH_USER:
+        # CDN_ENDPOINT:
+        # GO_BINARY_PATH:
+        # GO_ENV:
+        # GOOGLE_CLOUD_PROJECT:
+        # MY_S3_BUCKET_NAME:
+        # PROXY_FORCE_SSL:
 
-podSecurityContext: {}
-  # fsGroup: 2000
+  downloadMode:
+    ## @param config.downloadMode.existingConfigMap.enabled TODO:
+    ## @param config.downloadMode.existingConfigMap.secretName TODO:
+    existingConfigMap:
+      enabled: false
+      secretName: ""
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+    ## @param config.downloadMode.configMap.annotations Additional annotations of the config map containing the download mode file.
+    ## @param config.downloadMode.configMap.labels Additional labels of the config map containing the download mode file.
+    ## @param config.downloadMode.configMap.content Additional labels of the config map containing the download mode file.
+    configMap:
+      annotations: {}
+      labels: {}
+      content: |
+        # downloadURL = "https://proxy.golang.org"
+        #
+        # mode = "async_redirect"
+        #
+        # download "github.com/gomods/*" {
+        #     mode = "sync"
+        # }
+        #
+        # download "golang.org/x/*" {
+        #     mode = "none"
+        # }
+        #
+        # download "github.com/pkg/*" {
+        #     mode = "redirect"
+        #     downloadURL = "https://gocenter.io"
+        # }
 
-config: {}
-  # ATHENS_AZURE_ACCOUNT_KEY:
-  # ATHENS_AZURE_ACCOUNT_NAME:
-  # ATHENS_AZURE_CONTAINER_NAME:
-  # ATHENS_CLOUD_RUNTIME:
-  # ATHENS_DOWNLOAD_MODE:
-  # ATHENS_DOWNLOAD_URL:
-  # ATHENS_ETCD_ENDPOINTS:
-  # ATHENS_EXTERNAL_STORAGE_URL:
-  # ATHENS_FILTER_FILE:
-  # ATHENS_GITHUB_TOKEN:
-  # ATHENS_GLOBAL_ENDPOINT:
-  # ATHENS_GO_BINARY_ENV_VARS:
-  # ATHENS_GOGET_DIR:
-  # ATHENS_GOGET_WORKERS:
-  # ATHENS_GONOSUM_PATTERNS:
-  # ATHENS_HGRC_PATH:
-  # ATHENS_INDEX_MYSQL_DATABASE:
-  # ATHENS_INDEX_MYSQL_HOST:
-  # ATHENS_INDEX_MYSQL_PARAMS:
-  # ATHENS_INDEX_MYSQL_PASSWORD:
-  # ATHENS_INDEX_MYSQL_PORT:
-  # ATHENS_INDEX_MYSQL_PROTOCOL:
-  # ATHENS_INDEX_MYSQL_USER:
-  # ATHENS_INDEX_POSTGRES_DATABASE:
-  # ATHENS_INDEX_POSTGRES_HOST:
-  # ATHENS_INDEX_POSTGRES_PARAMS:
-  # ATHENS_INDEX_POSTGRES_PASSWORD:
-  # ATHENS_INDEX_POSTGRES_PORT:
-  # ATHENS_INDEX_POSTGRES_USER:
-  # ATHENS_INDEX_TYPE:
-  # ATHENS_LOG_LEVEL:
-  # ATHENS_MINIO_ACCESS_KEY_ID:
-  # ATHENS_MINIO_BUCKET_NAME:
-  # ATHENS_MINIO_ENDPOINT:
-  # ATHENS_MINIO_REGION:
-  # ATHENS_MINIO_SECRET_ACCESS_KEY:
-  # ATHENS_MINIO_USE_SSL:
-  # ATHENS_MONGO_CERT_PATH:
-  # ATHENS_MONGO_DEFAULT_DATABASE:
-  # ATHENS_MONGO_INSECURE:
-  # ATHENS_MONGO_STORAGE_URL:
-  # ATHENS_NETRC_PATH:
-  # ATHENS_PATH_PREFIX:
-  # ATHENS_PORT:
-  # ATHENS_PROTOCOL_WORKERS:
-  # ATHENS_PROXY_VALIDATOR:
-  # ATHENS_REDIS_ENDPOINT:
-  # ATHENS_REDIS_PASSWORD:
-  # ATHENS_REDIS_SENTINEL_ENDPOINTS:
-  # ATHENS_ROBOTS_FILE:
-  # ATHENS_SINGLE_FLIGHT_TYPE:
-  # ATHENS_STATS_EXPORTER:
-  # ATHENS_STORAGE_GCP_BUCKET:
-  # ATHENS_STORAGE_GCP_JSON_KEY:
-  # ATHENS_STORAGE_TYPE:
-  # ATHENS_SUM_DBS:
-  # ATHENS_TIMEOUT:
-  # ATHENS_TLSCERT_FILE:
-  # ATHENS_TLSKEY_FILE:
-  # ATHENS_TRACE_EXPORTER_URL:
-  # ATHENS_TRACE_EXPORTER:
-  # AWS_ACCESS_KEY_ID:
-  # AWS_ENDPOINT:
-  # AWS_FORCE_PATH_STYLE:
-  # AWS_REGION:
-  # AWS_SECRET_ACCESS_KEY:
-  # AWS_SESSION_TOKEN:
-  # BASIC_AUTH_PASS:
-  # BASIC_AUTH_USER:
-  # CDN_ENDPOINT:
-  # GO_BINARY_PATH:
-  # GO_ENV:
-  # GOOGLE_CLOUD_PROJECT:
-  # MY_S3_BUCKET_NAME:
-  # PROXY_FORCE_SSL:
+  gitConfig:
+    ## @param config.gitConfig.existingConfigMap.enabled TODO:
+    ## @param config.gitConfig.existingConfigMap.secretName TODO:
+    existingConfigMap:
+      enabled: false
+      secretName: ""
 
-livenessProbe:
-  httpGet:
-    scheme: HTTP
-    path: /healthz
-    port: http
+    ## @param config.gitConfig.configMap.annotations Additional annotations of the config map containing the download mode file.
+    ## @param config.gitConfig.configMap.labels Additional labels of the config map containing the download mode file.
+    ## @param config.gitConfig.configMap.content TODO:
+    configMap:
+      annotations: {}
+      labels: {}
+      content: |
 
-replicaCount: 1
+  netrc:
+    ## @param config.netrc.existingSecret.enabled TODO:.
+    ## @param config.netrc.existingSecret.secretName TODO:
+    existingSecret:
+      enabled: false
+      secretName: ""
 
-serviceAccount:
+    ## @param config.netrc.secret.annotations Additional annotations of the secret containing the database credentials.
+    ## @param config.netrc.secret.labels Additional labels of the secret containing the database credentials.
+    ## @param config.netrc.secret.content TODO:
+    secret:
+      annotations: {}
+      labels: {}
+      content: |
+        # The .netrc file
+        #
+        # The .netrc file contains login and initialization information used by the auto-login process. It generally
+        # resides in the user's home directory, but a location outside of the home directory can be set using the
+        # environment variable NETRC. Both locations are overridden by the command line option -N. The selected file
+        # must be a regular file, or access will be denied.
+        #
+        # https://www.gnu.org/software/inetutils/manual/html_node/The-_002enetrc-file.html
+        #
+        # default login           [name]     password  [password/token]
+        # machine github.com      [octocat]  password  [PAT]
+        # machine api.github.com  [octocat]  password  [PAT]
+
+  ssh:
+    ## @param config.ssh.existingSecret.enabled TODO:.
+    ## @param config.ssh.existingSecret.secretName TODO:
+    existingSecret:
+      enabled: false
+
+    ## @param config.ssh.secret.annotations Additional annotations of the secret containing the database credentials.
+    ## @param config.ssh.secret.labels Additional labels of the secret containing the database credentials.
+    ## @param config.ssh.secret.files TODO:
+    ## @skip config.ssh.secret.id_ed25519 TODO:
+    ## @skip config.ssh.secret.id_ed25519_pub TODO:
+    ## @skip config.ssh.secret.id_rsa TODO:
+    ## @skip config.ssh.secret.id_rsa_pub TODO:
+    secret:
+      annotations: {}
+      labels: {}
+      config: |
+        # Host *
+        #   IdentityFile ~/.ssh/id_ed25519
+        #   IdentityFile ~/.ssh/id_rsa
+      id_ed25519: ""
+      id_ed25519_pub: ""
+      id_rsa: ""
+      id_rsa_pub: ""
+
+## @section Deployment
+deployment:
+  ## @param deployment.annotations Additional deployment annotations.
+  ## @param deployment.labels Additional deployment labels.
   annotations: {}
+  labels: {}
 
-service:
+  ## @param deployment.additionalContainers List of additional containers.
+  additionalContainers: []
+  # - command: [ "sh", "-c", "echo hello world" ]
+  #   image: "docker.io/library/busybox:latest"
+  #   name: side-car
+
+  ## @param deployment.affinity Affinity for the athens-proxy deployment.
+  affinity: {}
+    # nodeAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #     nodeSelectorTerms:
+    #     - matchExpressions:
+    #       - key: kubernetes.io/os
+    #         operator: In
+    #         values:
+    #         - linux
+    #   preferredDuringSchedulingIgnoredDuringExecution:
+    #   - weight: 20
+    #     preference:
+    #       matchExpressions:
+    #       - key: kubernetes.io/arch
+    #         operator: In
+    #         values:
+    #         - amd64
+
+  ## @param deployment.initContainers List of additional init containers.
+  initContainers: []
+  # - command: [ "sh", "-c", "echo hello world" ]
+  #   image: "docker.io/library/busybox:latest"
+  #   name: init
+
+  ## @param deployment.dnsConfig dnsConfig of the athens-proxy deployment.
+  dnsConfig: {}
+    # nameservers:
+    # - 192.0.2.1 # this is an example
+    # searches:
+    # - ns1.svc.cluster-domain.example
+    # - my.dns.search.suffix
+    # options:
+    # - name: ndots
+    #   value: "2"
+    # - name: edns0
+
+  ## @param deployment.dnsPolicy dnsPolicy of the athens-proxy deployment.
+  dnsPolicy: ""
+
+  ## @param deployment.hostname Individual hostname of the pod.
+  ## @param deployment.subdomain Individual domain of the pod.
+  hostname: ""
+  subdomain: ""
+
+  ## @param deployment.hostNetwork Use the kernel network namespace of the host system.
+  hostNetwork: false
+
+  ## @param deployment.imagePullSecrets Secret to use for pulling the image.
+  imagePullSecrets: []
+  # - name: "my-custom-secret"
+
+  athensProxy:
+    ## @param deployment.athensProxy.args Arguments passed to the athens-proxy container.
+    args: []
+
+    ## @param deployment.athensProxy.command Command passed to the athens-proxy container.
+    command: []
+
+    ## @param deployment.athensProxy.env List of environment variables for the athens-proxy container.
+    env: []
+    # - name: SPECIAL_ENV_A
+    #   value: special-key
+    # - name: SPECIAL_ENV
+    #   valueFrom:
+    #     configMapKeyRef:
+    #       name: special-config
+    #       key: special-key
+    # - name: SPECIAL_ENV
+    #   valueFrom:
+    #     secretKeyRef:
+    #       name: special-secret
+    #       key: special-key
+
+    ## @param deployment.athensProxy.envFrom List of environment variables mounted from configMaps or secrets for the athens-proxy container.
+    envFrom: []
+    # - configMapRef:
+    #     name: special-config
+    # - secretRef:
+    #     name: special-secret
+
+    ## @param deployment.athensProxy.image.registry Image registry, eg. `docker.io`.
+    ## @param deployment.athensProxy.image.repository Image repository, eg. `library/busybox`.
+    ## @param deployment.athensProxy.image.tag Custom image tag, eg. `0.1.0`. Defaults to `appVersion`.
+    ## @param deployment.athensProxy.image.pullPolicy Image pull policy.
+    image:
+      registry: docker.io
+      repository: gomods/athens
+      tag: ""
+      pullPolicy: IfNotPresent
+
+    ## @param deployment.athensProxy.resources CPU and memory resources of the pod.
+    resources: {}
+      # limits:
+      #   cpu:
+      #   ephemeral-storage:
+      #   memory:
+      # requests:
+      #   cpu:
+      #   ephemeral-storage:
+      #   memory:
+
+    ## @param deployment.athensProxy.securityContext Security context of the container of the deployment.
+    securityContext: {}
+      # capabilities:
+      #   add:
+      #   - NET_RAW
+      #   drop:
+      #   - ALL
+      # privileged: false
+      # readOnlyRootFilesystem: true
+      # runAsNonRoot: true
+      # runAsUser: 1000
+
+    ## @param deployment.athensProxy.volumeMounts Additional volume mounts.
+    volumeMounts: []
+    # - name: my-configmap-volume
+    #   mountPath: /configmap
+    #   readOnly: true
+
+  ## @param deployment.nodeSelector NodeSelector of the athens-proxy deployment.
+  nodeSelector: {}
+
+  ## @param deployment.priorityClassName PriorityClassName of the athens-proxy deployment.
+  priorityClassName: ""
+
+  ## @param deployment.replicas Number of replicas for the athens-proxy deployment.
+  replicas: 1
+
+  ## @param deployment.restartPolicy Restart policy of the athens-proxy deployment.
+  restartPolicy: ""
+
+  ## @param deployment.securityContext Security context of the athens-proxy deployment.
+  securityContext: {}
+    # fsGroup: 2000
+
+  ## @param deployment.strategy.type Strategy type - `Recreate` or `RollingUpdate`.
+  ## @param deployment.strategy.rollingUpdate.maxSurge The maximum number of pods that can be scheduled above the desired number of pods during a rolling update.
+  ## @param deployment.strategy.rollingUpdate.maxUnavailable The maximum number of pods that can be unavailable during a rolling update.
+  strategy:
+    type: "RollingUpdate"
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+  ## @param deployment.terminationGracePeriodSeconds How long to wait until forcefully kill the pod.
+  terminationGracePeriodSeconds: 60
+
+  ## @param deployment.tolerations Tolerations of the athens-proxy deployment.
+  tolerations: []
+  # - key: database/type
+  #   operator: Equal
+  #   value: postgres
+  #   effect: NoSchedule
+
+  ## @param deployment.topologySpreadConstraints TopologySpreadConstraints of the athens-proxy deployment.
+  topologySpreadConstraints: []
+  # - topologyKey: kubernetes.io/hostname
+  #   whenUnsatisfiable: DoNotSchedule
+  #   labelSelector:
+  #     matchLabels:
+  #       app.kubernetes.io/instance: prometheus-athens-proxy
+
+  ## @param deployment.volumes Additional volumes to mount into the pods of the prometheus-exporter deployment.
+  volumes: []
+  # - name: my-configmap-volume
+  #   config:
+  #     name: my-configmap
+  # - name: my-secret-volume
+  #   secret:
+  #     secretName: my-secret
+
+## @section Horizontal Pod Autoscaler (HPA)
+# In order for the HPA to function successfully, a metric server is required, especially for resource consumption. The
+# metric server enables the CPU and memory utilisation to be recorded. If such a metric server is not available, the HPA
+# cannot scale pods based on CPU or memory utilisation. Further information be be found here:
+# https://github.com/kubernetes-sigs/metrics-server#deployment
+hpa:
+  ## @param hpa.enabled Enable the horizontal pod autoscaler (HPA).
+  ## @param hpa.annotations Additional annotations for the HPA.
+  ## @param hpa.labels Additional labels for the HPA.
+  ## @param hpa.metrics Metrics contains the specifications for which to use to calculate the desired replica count.
+  ## @skip hpa.metrics Skip individual HPA metric configurations.
+  ## @param hpa.minReplicas Min replicas is the lower limit for the number of replicas to which the autoscaler can scale down.
+  ## @param hpa.maxReplicas Upper limit for the number of pods that can be set by the autoscaler.
+  enabled: false
   annotations: {}
-  # externalIPs: []
-  # externalTrafficPolicy: "Cluster"
-  # loadBalancerClass: ""
-  # loadBalancerIP: ""
-  # loadBalancerSourceRanges: []
-  # internalTrafficPolicy: "Cluster"
-  name: http
-  targetPort: 3000
-  type: ClusterIP
-  port: 3000
+  labels: {}
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 65
+        type: Utilization
+    type: Resource
+  # - resource:
+  #     name: memory
+  #     target:
+  #       averageUtilization: 65
+  #       type: Utilization
+  minReplicas: 1
+  maxReplicas: 10
 
+## @section Ingress
 ingress:
+  ## @param ingress.enabled Enable creation of an ingress resource. Requires, that the http service is also enabled.
+  ## @param ingress.className Ingress class.
+  ## @param ingress.annotations Additional ingress annotations.
+  ## @param ingress.labels Additional ingress labels.
   enabled: false
   className: "nginx"
   annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # cert-manager.io/issuer:
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-  - host: "your-hostname"
-    paths:
-    - path: /
-      pathType: ImplementationSpecific
-  tls:
-  - secretName: "your-tls-secret"
-    hosts:
-    - "your-hostname"
+  labels: {}
 
-readinessProbe:
-  httpGet:
-    scheme: HTTP
-    path: /healthz
-    port: http
+  ## @param ingress.hosts Ingress specific configuration. Specification only required when another ingress controller is used instead of `t1k.
+  ## @skip ingress.hosts Skip individual host configuration.
+  hosts: []
+  # - host: athens-proxy.example.local
+  #   paths:
+  #   - path: /
+  #     pathType: Prefix
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  ## @param ingress.tls Ingress TLS settings. Specification only required when another ingress controller is used instead of `t1k``.
+  ## @skip ingress.tls Skip individual TLS configuration.
+  tls: []
+  # - secretName: athens-proxy-http-tls
+  #   hosts:
+  #   - athens-proxy.example.local
 
-nodeSelector:
-  kubernetes.io/arch: amd64
+## @section Persistence
+persistence:
+  ## @param persistence.enabled Enable the feature to store the data on a persistent volume claim. If enabled, the volume will be automatically be mounted into the pod. Furthermore, the env `ATHENS_STORAGE_TYPE=disk` will automatically be defined.
+  enabled: false
 
-tolerations: []
+  data:
+    ## @param persistence.data.mountPath The path where the persistent volume should be mounted in the container file system. This variable controls `ATHENS_DISK_STORAGE_ROOT`.
+    mountPath: "/var/www/athens-proxy/data"
 
-# extra volumes for the pod
-extraVolumes: {}
-# The following example mount the same secret, which contains tls certificates
-# under different names. Each volume mount contains only selected items of the
-# secret. This make it easier to place the items on different locations inside the
-# container filesystem via extraVolumeMounts.
-# - name: custom-ca-anchor
-#   secret:
-#     secretName: athens-proxy-custom-tls-certificates
-#     items:
-#     - key: ca.crt
-#       path: ca.crt
-#       mode: 0444
-# - name: custom-tls-certificates
-#   secret:
-#     secretName: athens-proxy-custom-tls-certificates
-#     items:
-#     - key: tls.key
-#       path: tls.key
-#       mode: 0400
-#     - key: tls.crt
-#       path: tls.crt
-#       mode: 0444
+    existingPersistentVolumeClaim:
+      enabled: false
+      persistentVolumeClaimName: ""
 
-extraVolumeMounts: {}
-# The following example follows the example of extraVolumes and mounts the
-# volumes to the corresponding paths in the container filesystem.
-# - name: custom-ca-anchor
-#   mountPath: /usr/local/share/ca-certificates
-# - name: custom-tls-certificates
-#   mountPath: /etc/athens-proxy/tls
+    persistentVolumeClaim:
+      annotations: {}
+      labels: {}
+      accessModes:
+      - ReadWriteMany
+      storageClass: ""
+      storageSize: "5Gi"
+
+## @section NetworkPolicies
+## @param networkPolicies.enabled Enable network policies in general.
+networkPolicies:
+  enabled: false
+
+  ## @param networkPolicies.default.enabled Enable the network policy for accessing the application by default. For example to scape the metrics.
+  ## @param networkPolicies.default.annotations Additional network policy annotations.
+  ## @param networkPolicies.default.labels Additional network policy labels.
+  ## @param networkPolicies.default.policyTypes List of policy types. Supported is ingress, egress or ingress and egress.
+  ## @param networkPolicies.default.egress Concrete egress network policy implementation.
+  ## @skip networkPolicies.default.egress Skip individual egress configuration.
+  ## @param networkPolicies.default.ingress Concrete ingress network policy implementation.
+  ## @skip networkPolicies.default.ingress Skip individual ingress configuration.
+  default:
+    enabled: false
+    annotations: {}
+    labels: {}
+    policyTypes: []
+    # - Egress
+    # - Ingress
+    egress: []
+    # Allow outgoing traffic to database host
+    #
+    # - to:
+    #   - ipBlock:
+    #       cidr: 192.168.179.1/32
+    #   ports:
+    #   - port: 5432
+    #     protocol: TCP
+
+    # Allow outgoing DNS traffic to the internal running DNS-Server. For example core-dns.
+    #
+    # - to:
+    #   - namespaceSelector:
+    #       matchLabels:
+    #         kubernetes.io/metadata.name: kube-system
+    #     podSelector:
+    #       matchLabels:
+    #        k8s-app: kube-dns
+    #   ports:
+    #   - port: 53
+    #     protocol: TCP
+    #   - port: 53
+    #     protocol: UDP
+
+    ingress: []
+    # Allow incoming HTTP traffic from prometheus.
+    #
+    # - from:
+    #   - namespaceSelector:
+    #       matchLabels:
+    #         kubernetes.io/metadata.name: monitoring
+    #     podSelector:
+    #       matchLabels:
+    #         app.kubernetes.io/name: prometheus
+    #   ports:
+    #   - port: http
+    #     protocol: TCP
+
+    # Allow incoming HTTP traffic from ingress-nginx.
+    #
+    # - from:
+    #   - namespaceSelector:
+    #       matchLabels:
+    #         kubernetes.io/metadata.name: ingress-nginx
+    #     podSelector:
+    #       matchLabels:
+    #         app.kubernetes.io/name: ingress-nginx
+    #   ports:
+    #   - port: http
+    #     protocol: TCP
+
+## @section Service
+## @param services.http.enabled Enable the service.
+## @param services.http.annotations Additional service annotations.
+## @param services.http.externalIPs External IPs for the service.
+## @param services.http.externalTrafficPolicy If `service.type` is `NodePort` or `LoadBalancer`, set this to `Local` to tell kube-proxy to only use node local endpoints for cluster external traffic. Furthermore, this enables source IP preservation.
+## @param services.http.internalTrafficPolicy If `service.type` is `NodePort` or `LoadBalancer`, set this to `Local` to tell kube-proxy to only use node local endpoints for cluster internal traffic.
+## @param services.http.ipFamilies IPFamilies is list of IP families (e.g. `IPv4`, `IPv6`) assigned to this service. This field is usually assigned automatically based on cluster configuration and only required for customization.
+## @param services.http.labels Additional service labels.
+## @param services.http.loadBalancerClass LoadBalancerClass is the class of the load balancer implementation this Service belongs to. Requires service from type `LoadBalancer`.
+## @param services.http.loadBalancerIP LoadBalancer will get created with the IP specified in this field. Requires service from type `LoadBalancer`.
+## @param services.http.loadBalancerSourceRanges Source range filter for LoadBalancer. Requires service from type `LoadBalancer`.
+## @param services.http.port Port to forward the traffic to.
+## @param services.http.sessionAffinity Supports `ClientIP` and `None`. Enable client IP based session affinity via `ClientIP`.
+## @param services.http.sessionAffinityConfig Contains the configuration of the session affinity.
+## @param services.http.type Kubernetes service type for the traffic.
+services:
+  http:
+    enabled: true
+    annotations: {}
+    externalIPs: []
+    externalTrafficPolicy: "Cluster"
+    internalTrafficPolicy: "Cluster"
+    ipFamilies: []
+    labels: {}
+    loadBalancerClass: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    port: 3000
+    sessionAffinity: "None"
+    sessionAffinityConfig: {}
+    type: "ClusterIP"
+
+## @section ServiceAccount
+serviceAccount:
+  ## @param serviceAccount.existing.enabled Use an existing service account instead of creating a new one. Assumes that the user has all the necessary kubernetes API authorizations.
+  ## @param serviceAccount.existing.serviceAccountName Name of the existing service account.
+  existing:
+    enabled: false
+    serviceAccountName: ""
+
+  ## @param serviceAccount.new.annotations Additional service account annotations.
+  ## @param serviceAccount.new.labels Additional service account labels.
+  ## @param serviceAccount.new.automountServiceAccountToken Enable/disable auto mounting of the service account token.
+  ## @param serviceAccount.new.imagePullSecrets ImagePullSecrets is a list of references to secrets in the same namespace to use for pulling any images in pods that reference this serviceAccount.
+  ## @param serviceAccount.new.secrets Secrets is the list of secrets allowed to be used by pods running using this ServiceAccount.
+  new:
+    annotations: {}
+    labels: {}
+    automountServiceAccountToken: true
+    imagePullSecrets: []
+    # - name: "my-image-pull-secret"
+    secrets: []
+    # - name: "my-secret"
+    #   namespace: "my-namespace"
+    #   fieldPath: "my-field"
