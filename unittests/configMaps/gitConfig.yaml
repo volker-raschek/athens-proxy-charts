@@ -30,7 +30,7 @@ tests:
   - containsDocument:
       apiVersion: v1
       kind: ConfigMap
-      name: athens-proxy-unittest-git-config
+      name: athens-proxy-unittest-gitconfig
       namespace: testing
   - notExists:
       path: metadata.annotations
