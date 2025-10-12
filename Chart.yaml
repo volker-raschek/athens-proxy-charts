@@ -19,6 +19,6 @@ keywords:
 - go-proxy
 
 sources:
-- https://github.com/volker-raschek/athens-proxy-charts
+- https://git.cryptic.systems/volker.raschek/athens-proxy-charts
 - https://github.com/gomods/athens
 - https://hub.docker.com/r/gomods/athens
