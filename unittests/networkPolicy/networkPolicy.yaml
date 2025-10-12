@@ -1,49 +1,30 @@
 chart:
   appVersion: 0.1.0
   version: 0.1.0
-suite: NetworkPolicies template
+suite: NetworkPolicy template
 release:
   name: athens-proxy-unittest
   namespace: testing
 templates:
-- templates/networkPolicies.yaml
+- templates/networkPolicy.yaml
 tests:
-- it: Skip networkPolicies in general disabled.
+- it: Skip rendering networkPolicy
   set:
-    networkPolicies.enabled: false
+    networkPolicy.enabled: false
   asserts:
   - hasDocuments:
       count: 0
 
-- it: Skip networkPolicy 'default' when disabled.
+- it: Render default networkPolicy
   set:
-    networkPolicies.enabled: true
-    networkPolicies.default.enabled: false
+    networkPolicy.enabled: true
   asserts:
   - hasDocuments:
-      count: 0
-
-- it: Loop over networkPolicies
-  set:
-    networkPolicies.enabled: true
-    networkPolicies.default.enabled: false
-    networkPolicies.nginx.enabled: true
-    networkPolicies.prometheus.enabled: true
-  asserts:
-  - hasDocuments:
-      count: 2
-
-- it: Template networkPolicy 'default' without policyTypes, egress and ingress configuration
-  set:
-    networkPolicies.enabled: true
-    networkPolicies.default.enabled: true
-  asserts:
-  - hasDocuments:
-      count: 1
+      count:  1
   - containsDocument:
       apiVersion: networking.k8s.io/v1
       kind: NetworkPolicy
-      name: athens-proxy-unittest-default
+      name: athens-proxy-unittest
       namespace: testing
   - notExists:
       path: metadata.annotations
@@ -67,29 +48,28 @@ tests:
   - notExists:
       path: spec.ingress
 
-- it: Template networkPolicy 'default' with policyTypes, egress and ingress configuration
+- it: Template networkPolicy with policyTypes, egress and ingress configuration
   set:
-    networkPolicies.enabled: true
-    networkPolicies.default.enabled: true
-    networkPolicies.default.policyTypes:
+    networkPolicy.enabled: true
+    networkPolicy.policyTypes:
     - Egress
     - Ingress
-    networkPolicies.default.ingress:
+    networkPolicy.ingress:
     - from:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: khv-production
+            kubernetes.io/metadata.name: monitoring
         podSelector:
           matchLabels:
             app.kubernetes.io/name: prometheus
-    networkPolicies.default.egress:
+    networkPolicy.egress:
     - to:
       - namespaceSelector:
           matchLabels:
-            kubernetes.io/metadata.name: database
+            kubernetes.io/metadata.name: ingress-nginx
         podSelector:
           matchLabels:
-            app.kubernetes.io/name: oracle
+            app.kubernetes.io/name: ingress-nginx
   asserts:
   - equal:
       path: spec.policyTypes
@@ -102,17 +82,17 @@ tests:
       - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: database
+              kubernetes.io/metadata.name: ingress-nginx
           podSelector:
             matchLabels:
-              app.kubernetes.io/name: oracle
+              app.kubernetes.io/name: ingress-nginx
   - equal:
       path: spec.ingress
       value:
       - from:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: khv-production
+              kubernetes.io/metadata.name: monitoring
           podSelector:
             matchLabels:
               app.kubernetes.io/name: prometheus
