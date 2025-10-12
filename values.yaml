@@ -113,10 +113,10 @@ config:
       annotations: {}
       labels: {}
       content: |
-        # downloadURL = "https://proxy.golang.org"
-        #
-        # mode = "async_redirect"
-        #
+        downloadURL = "https://proxy.golang.org"
+
+        mode = "async_redirect"
+
         # download "github.com/gomods/*" {
         #     mode = "sync"
         # }
