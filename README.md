@@ -98,8 +98,8 @@ network policy implementation of CNI plugins. It's support only the official API
 
 The example below is an excerpt of the `values.yaml` file. The network policy contains ingress rules to allow incoming
 traffic from an ingress controller. Additionally two egress rules are defined. The first one to allow the application
-outgoing access to the internal running DNS server `core-dns`. The second rule to be able to access the Apache Maven
-Central repository via HTTPS.
+outgoing access to the internal running DNS server `core-dns`. The second rule to be able to access the upstream Go
+proxy `https://proxy.golang.org` via HTTPS.
 
 > [!IMPORTANT]
 > Please keep in mind, that the namespace and pod selector labels can be different from environment to environment. For
