@@ -63,6 +63,34 @@ helm install --version "${CHART_VERSION}" athens-proxy volker.raschek/athens-pro
 
 The following examples serve as individual configurations and as inspiration for how deployment problems can be solved.
 
+#### Avoid CPU throttling by defining a CPU limit
+
+If the application is deployed with a CPU resource limit, Prometheus may throw a CPU throttling warning for the
+application. This has more or less to do with the fact that the application finds the number of CPUs of the host, but
+cannot use the available CPU time to perform computing operations.
+
+The application must be informed that despite several CPUs only a part (limit) of the available computing time is
+available. As this is a Golang application, this can be implemented using `GOMAXPROCS`. The following example is one way
+of defining `GOMAXPROCS` automatically based on the defined CPU limit like `1000m`. Please keep in mind, that the CFS
+rate of `100ms` - default on each kubernetes node, is also very important to avoid CPU throttling.
+
+Further information about this topic can be found in one of Kanishk's blog
+[posts](https://kanishk.io/posts/cpu-throttling-in-containerized-go-apps/).
+
+> [!NOTE]
+> The environment variable `GOMAXPROCS` is set automatically, when a CPU limit is defined. An explicit configuration is
+> not anymore required.
+>
+> Please take care the a CPU limit < `1000m` can also lead to CPU throttling. Please read the linked documentation carefully.
+
+```bash
+CHART_VERSION=0.3.0
+helm install --version "${CHART_VERSION}" athens-proxy volker.raschek/athens-proxy \
+  --set 'deployment.athensProxy.env.name=GOMAXPROCS' \
+  --set 'deployment.athensProxy.env.valueFrom.resourceFieldRef.resource=limits.cpu' \
+  --set 'deployment.athensProxy.resources.limits.cpu=1000m'
+```
+
 #### Network policies
 
 Network policies can only take effect, when the used CNI plugin support network policies. The chart supports no custom
