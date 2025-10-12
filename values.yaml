@@ -130,7 +130,7 @@ config:
         #
         # download "github.com/pkg/*" {
         #     mode = "redirect"
-        #     downloadURL = "https://gocenter.io"
+        #     downloadURL = "https://proxy.golang.org"
         # }
 
   gitConfig:
