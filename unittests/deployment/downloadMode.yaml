@@ -6,42 +6,57 @@ release:
   name: athens-proxy-unittest
   namespace: testing
 templates:
+- templates/configMapDownloadMode.yaml
+- templates/configMapGitConfig.yaml
 - templates/deployment.yaml
+- templates/secretNetRC.yaml
+- templates/secretSSH.yaml
 tests:
 - it: Rendering default without mounted download mode config map
   asserts:
+    - notExists:
+        path: spec.template.metadata.annotations.checksum/config-map-athens-proxy-unittest-download-mode-file
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.containers[0].env
         content:
           name: ATHENS_DOWNLOAD_MODE
           value: file:/etc/athens/config/download-mode.d/download-mode
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: download-mode
           mountPath: /etc/athens/config/download-mode.d
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.volumes
         content:
           name: download-mode
           configMap:
             name: athens-proxy-unittest-download-mode-file
+      template: templates/deployment.yaml
 
 - it: Rendering default with mounted gitconfig configMap
   set:
     config.downloadMode.enabled: true
     persistence.enabled: true
   asserts:
+    - exists:
+        path: spec.template.metadata.annotations.checksum/config-map-athens-proxy-unittest-download-mode-file
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].env
         content:
           name: ATHENS_DOWNLOAD_MODE
           value: file:/etc/athens/config/download-mode.d/download-mode
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: download-mode
           mountPath: /etc/athens/config/download-mode.d
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.volumes
         content:
@@ -52,6 +67,7 @@ tests:
                 mode: 0644
                 path: download-mode
             name: athens-proxy-unittest-download-mode-file
+      template: templates/deployment.yaml
 
 - it: Rendering with custom download mode configMap
   set:
@@ -61,16 +77,21 @@ tests:
     config.downloadMode.existingConfigMap.downloadModeKey: "my-custom-download-mode-filename-key"
     persistence.enabled: true
   asserts:
+    - notExists:
+        path: spec.template.metadata.annotations.checksum/config-map-athens-proxy-unittest-download-mode-file
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].env
         content:
           name: ATHENS_DOWNLOAD_MODE
           value: file:/etc/athens/config/download-mode.d/download-mode
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: download-mode
           mountPath: /etc/athens/config/download-mode.d
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.volumes
         content:
@@ -81,3 +102,4 @@ tests:
               path: "download-mode"
               mode: 0644
             name: my-custom-configmap
+      template: templates/deployment.yaml

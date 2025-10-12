@@ -6,7 +6,11 @@ release:
   name: athens-proxy-unittest
   namespace: testing
 templates:
+- templates/configMapDownloadMode.yaml
+- templates/configMapGitConfig.yaml
 - templates/deployment.yaml
+- templates/secretNetRC.yaml
+- templates/secretSSH.yaml
 tests:
 - it: Test persistent volume claim
   set:

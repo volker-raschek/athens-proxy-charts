@@ -4,6 +4,18 @@
 
 {{- define "athens-proxy.pod.annotations" -}}
 {{ include "athens-proxy.annotations" . }}
+{{- if and .Values.config.downloadMode.enabled (not .Values.config.downloadMode.existingConfigMap.enabled) -}}
+{{- printf "checksum/config-map-%s: %s" (include "athens-proxy.configMap.downloadMode.name" $) (include (print $.Template.BasePath "/configMapDownloadMode.yaml") . | sha256sum) }}
+{{- end -}}
+{{- if and .Values.config.gitConfig.enabled (not .Values.config.gitConfig.existingConfigMap.enabled) -}}
+{{- printf "checksum/config-map-%s: %s" (include "athens-proxy.configMap.gitConfig.name" $) (include (print $.Template.BasePath "/configMapGitConfig.yaml") . | sha256sum) }}
+{{- end -}}
+{{- if and .Values.config.netrc.enabled (not .Values.config.netrc.existingSecret.enabled) -}}
+{{- printf "checksum/secret-%s: %s" (include "athens-proxy.secrets.netrc.name" $) (include (print $.Template.BasePath "/secretNetRC.yaml") . | sha256sum) }}
+{{- end -}}
+{{- if and .Values.config.ssh.enabled (not .Values.config.ssh.existingSecret.enabled) -}}
+{{- printf "checksum/secret-%s: %s" (include "athens-proxy.secrets.ssh.name" $) (include (print $.Template.BasePath "/secretSSH.yaml") . | sha256sum) }}
+{{- end -}}
 {{- end }}
 
 {{/* labels */}}

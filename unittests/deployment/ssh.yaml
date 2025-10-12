@@ -6,40 +6,52 @@ release:
   name: athens-proxy-unittest
   namespace: testing
 templates:
+- templates/configMapDownloadMode.yaml
+- templates/configMapGitConfig.yaml
 - templates/deployment.yaml
+- templates/secretNetRC.yaml
+- templates/secretSSH.yaml
 tests:
 - it: Rendering default without mounted ssh secret
   asserts:
+    - notExists:
+        path: spec.template.metadata.annotations.checksum/secret-athens-proxy-unittest-ssh
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/config
           subPath: config
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_ed25519
           subPath: id_ed25519
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_ed25519.pub
           subPath: id_ed25519.pub
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_rsa
           subPath: id_rsa
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_rsa.pub
           subPath: id_rsa.pub
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.volumes
         content:
@@ -64,6 +76,7 @@ tests:
                   path: id_rsa.pub
                   mode: 0644
                 name: athens-proxy-unittest-ssh
+      template: templates/deployment.yaml
 
 - it: Rendering default with mounted ssh config
   set:
@@ -76,6 +89,7 @@ tests:
           name: secrets
           mountPath: /root/.ssh/config
           subPath: config
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.volumes
         content:
@@ -88,6 +102,7 @@ tests:
                   path: config
                   mode: 0600
                 name: athens-proxy-unittest-ssh
+      template: templates/deployment.yaml
 
 - it: Rendering default with mounted ssh keys
   set:
@@ -98,36 +113,44 @@ tests:
     config.ssh.secret.id_rsa_pub: bar
     persistence.enabled: true
   asserts:
+    - exists:
+        path: spec.template.metadata.annotations.checksum/secret-athens-proxy-unittest-ssh
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/config
           subPath: config
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_ed25519
           subPath: id_ed25519
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_ed25519.pub
           subPath: id_ed25519.pub
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_rsa
           subPath: id_rsa
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_rsa.pub
           subPath: id_rsa.pub
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.volumes
         content:
@@ -152,6 +175,7 @@ tests:
                   path: id_rsa.pub
                   mode: 0644
                 name: athens-proxy-unittest-ssh
+      template: templates/deployment.yaml
 
 - it: Rendering with custom ssh secret
   set:
@@ -165,36 +189,44 @@ tests:
     config.ssh.existingSecret.id_rsaPubKey : "my-public-rsa-key"
     persistence.enabled: true
   asserts:
+    - notExists:
+        path: spec.template.metadata.annotations.checksum/secret-athens-proxy-unittest-ssh
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/config
           subPath: config
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_ed25519
           subPath: id_ed25519
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_ed25519.pub
           subPath: id_ed25519.pub
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_rsa
           subPath: id_rsa
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.ssh/id_rsa.pub
           subPath: id_rsa.pub
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.volumes
         content:
@@ -219,3 +251,4 @@ tests:
                   path: id_rsa.pub
                   mode: 0644
                 name: my-custom-secret
+      template: templates/deployment.yaml

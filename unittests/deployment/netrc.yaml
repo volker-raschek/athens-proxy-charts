@@ -6,15 +6,23 @@ release:
   name: athens-proxy-unittest
   namespace: testing
 templates:
+- templates/configMapDownloadMode.yaml
+- templates/configMapGitConfig.yaml
 - templates/deployment.yaml
+- templates/secretNetRC.yaml
+- templates/secretSSH.yaml
 tests:
 - it: Rendering default without mounted netrc secret
   asserts:
+    - notExists:
+        path: spec.template.metadata.annotations.checksum/secret-athens-proxy-unittest-netrc
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: netrc
           mountPath: /root
+      template: templates/deployment.yaml
     - notContains:
         path: spec.template.spec.volumes
         content:
@@ -27,18 +35,23 @@ tests:
                   path: .netrc
                   mode: 0600
                 name: athens-proxy-unittest-netrc
+      template: templates/deployment.yaml
 
 - it: Rendering default with mounted netrc secret
   set:
     config.netrc.enabled: true
     persistence.enabled: true
   asserts:
+    - exists:
+        path: spec.template.metadata.annotations.checksum/secret-athens-proxy-unittest-netrc
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.netrc
           subPath: .netrc
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.volumes
         content:
@@ -51,6 +64,7 @@ tests:
                   path: .netrc
                   mode: 0600
                 name: athens-proxy-unittest-netrc
+      template: templates/deployment.yaml
 
 - it: Rendering with custom netrc secret
   set:
@@ -60,12 +74,16 @@ tests:
     config.netrc.existingSecret.netrcKey: "my-netrc-key"
     persistence.enabled: true
   asserts:
+    - notExists:
+        path: spec.template.metadata.annotations.checksum/secret-athens-proxy-unittest-netc
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: secrets
           mountPath: /root/.netrc
           subPath: .netrc
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.volumes
         content:
@@ -78,3 +96,4 @@ tests:
                   path: .netrc
                   mode: 0600
                 name: my-custom-secret
+      template: templates/deployment.yaml
