@@ -34,6 +34,18 @@
 {{/* envFrom */}}
 
 {{- define "athens-proxy.deployment.envFrom" -}}
+{{- $envFrom := .Values.deployment.athensProxy.envFrom | default (list) }}
+
+{{- if .Values.config.env.enabled }}
+{{- $secretName := include "athens-proxy.secrets.env.name" $ }}
+{{- if and .Values.config.env.existingSecret.enabled (gt (len .Values.config.env.existingSecret.secretName) 0)}}
+{{- $secretName = .Values.config.env.existingSecret.secretName }}
+{{- end }}
+{{- $envFrom = concat $envFrom (list (dict "secretRef" (dict "name" $secretName))) }}
+{{- end }}
+
+{{ toYaml (dict "envFrom" $envFrom) }}
+
 {{- end -}}
 
 {{/* image */}}

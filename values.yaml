@@ -8,6 +8,9 @@ fullnameOverride: ""
 ## @section Configuration
 config:
   env:
+    ## @param config.env.enabled Enable mounting of the secret as environment variables.
+    enabled: false
+
     ## @param config.env.existingSecret.enabled Mount an existing secret containing the application specific environment variables.
     ## @param config.env.existingSecret.secretName Name of the existing secret containing the application specific environment variables.
     existingSecret:
