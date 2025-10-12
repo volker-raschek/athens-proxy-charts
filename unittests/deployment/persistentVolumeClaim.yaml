@@ -6,7 +6,7 @@ release:
   name: athens-proxy-unittest
   namespace: testing
 templates:
-- templates/athens-proxy/deployment.yaml
+- templates/deployment.yaml
 tests:
 - it: Test persistent volume claim
   set:
@@ -17,26 +17,26 @@ tests:
         content:
           name: ATHENS_STORAGE_TYPE
           value: disk
-      template: templates/athens-proxy/deployment.yaml
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].env
         content:
           name: ATHENS_DISK_STORAGE_ROOT
           value: /var/www/athens-proxy/data
-      template: templates/athens-proxy/deployment.yaml
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: data
           mountPath: /var/www/athens-proxy/data
-      template: templates/athens-proxy/deployment.yaml
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.volumes
         content:
           name: data
           persistentVolumeClaim:
             claimName: athens-proxy-unittest-data
-      template: templates/athens-proxy/deployment.yaml
+      template: templates/deployment.yaml
 
 - it: Test existing persistent volume claim
   set:
@@ -51,23 +51,23 @@ tests:
         content:
           name: ATHENS_STORAGE_TYPE
           value: disk
-      template: templates/athens-proxy/deployment.yaml
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].env
         content:
           name: ATHENS_DISK_STORAGE_ROOT
           value: /mnt/go-proxy/data
-      template: templates/athens-proxy/deployment.yaml
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: data
           mountPath: /mnt/go-proxy/data
-      template: templates/athens-proxy/deployment.yaml
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.volumes
         content:
           name: data
           persistentVolumeClaim:
             claimName: my-special-pvc
-      template: templates/athens-proxy/deployment.yaml
+      template: templates/deployment.yaml

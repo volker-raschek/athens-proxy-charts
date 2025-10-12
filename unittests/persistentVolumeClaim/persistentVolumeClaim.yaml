@@ -6,7 +6,7 @@ release:
   name: athens-proxy-unittest
   namespace: testing
 templates:
-- templates/athens-proxy/persistentVolumeClaim.yaml
+- templates/persistentVolumeClaim.yaml
 tests:
 - it: Rendering default
   asserts:

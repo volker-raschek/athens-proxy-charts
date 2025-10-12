@@ -6,7 +6,7 @@ release:
   name: athens-proxy-unittest
   namespace: testing
 templates:
-- templates/athens-proxy/ingress.yaml
+- templates/ingress.yaml
 tests:
 - it: Skip ingress by default.
   asserts:

@@ -6,7 +6,7 @@ release:
   name: athens-proxy-unittest
   namespace: testing
 templates:
-- templates/athens-proxy/configMapGitConfig.yaml
+- templates/configMapGitConfig.yaml
 tests:
 - it: Skip rending by using existing config map.
   set:
