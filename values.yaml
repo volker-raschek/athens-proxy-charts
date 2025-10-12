@@ -111,7 +111,7 @@ config:
 
     ## @param config.downloadMode.configMap.annotations Additional annotations of the config map containing the download mode file.
     ## @param config.downloadMode.configMap.labels Additional labels of the config map containing the download mode file.
-    ## @param config.downloadMode.configMap.content The content of the download mode file.
+    ## @skip config.downloadMode.configMap.content The content of the download mode file.
     configMap:
       annotations: {}
       labels: {}
@@ -147,7 +147,7 @@ config:
 
     ## @param config.gitConfig.configMap.annotations Additional annotations of the config map containing the .gitconfig file.
     ## @param config.gitConfig.configMap.labels Additional labels of the config map containing the .gitconfig file.
-    ## @param config.gitConfig.configMap.content The content of the .gitconfig file.
+    ## @skip config.gitConfig.configMap.content The content of the .gitconfig file.
     configMap:
       annotations: {}
       labels: {}
@@ -173,7 +173,7 @@ config:
 
     ## @param config.netrc.secret.annotations Additional annotations of the secret containing the database credentials.
     ## @param config.netrc.secret.labels Additional labels of the secret containing the database credentials.
-    ## @param config.netrc.secret.content The content of the .netrc file.
+    ## @skip config.netrc.secret.content The content of the .netrc file.
     secret:
       annotations: {}
       labels: {}
@@ -213,7 +213,7 @@ config:
 
     ## @param config.ssh.secret.annotations Additional annotations of the secret containing the public and private SSH key files.
     ## @param config.ssh.secret.labels Additional labels of the secret containing the public and private SSH key files.
-    ## @param config.ssh.secret.config The content of the SSH client config file.
+    ## @skip config.ssh.secret.config The content of the SSH client config file.
     ## @skip config.ssh.secret.id_ed25519 The content of the private SSH ed25519 key.
     ## @skip config.ssh.secret.id_ed25519_pub The content of the public SSH ed25519 key.
     ## @skip config.ssh.secret.id_rsa The content of the private SSH RSA key.
