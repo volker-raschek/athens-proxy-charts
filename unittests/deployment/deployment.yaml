@@ -463,3 +463,10 @@ tests:
       - name: data
         mountPath: /usr/lib/athens-proxy/data
     template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.volumes
+      value:
+      - name: data
+        hostPath:
+          path: /usr/lib/athens-proxy/data
+    template: templates/deployment.yaml

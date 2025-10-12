@@ -80,6 +80,7 @@
 
 {{- define "athens-proxy.deployment.volumeMounts" -}}
 {{- $volumeMounts := .Values.deployment.athensProxy.volumeMounts | default (list) }}
+
 {{- if .Values.persistence.enabled }}
 {{- $volumeMounts = concat $volumeMounts (list (dict "name" "data" "mountPath" .Values.persistence.data.mountPath)) }}
 {{- end }}
@@ -129,7 +130,7 @@
 {{/* volumes */}}
 
 {{- define "athens-proxy.deployment.volumes" -}}
-{{- $volumes := .Values.deployment.athensProxy.volumes | default (list) }}
+{{- $volumes := .Values.deployment.volumes | default (list) }}
 
 
 {{/* volumes (data) */}}
