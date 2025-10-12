@@ -257,7 +257,7 @@ annotations with the prefix `checksum`.
 | `deployment.terminationGracePeriodSeconds`         | How long to wait until forcefully kill the pod.                                                            | `60`            |
 | `deployment.tolerations`                           | Tolerations of the athens-proxy deployment.                                                                | `[]`            |
 | `deployment.topologySpreadConstraints`             | TopologySpreadConstraints of the athens-proxy deployment.                                                  | `[]`            |
-| `deployment.volumes`                               | Additional volumes to mount into the pods of the prometheus-exporter deployment.                           | `[]`            |
+| `deployment.volumes`                               | Additional volumes to mount into the pods of the athens-proxy deployment.                                  | `[]`            |
 
 ### Horizontal Pod Autoscaler (HPA)
 
