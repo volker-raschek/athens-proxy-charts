@@ -404,9 +404,9 @@ deployment:
   #   whenUnsatisfiable: DoNotSchedule
   #   labelSelector:
   #     matchLabels:
-  #       app.kubernetes.io/instance: prometheus-athens-proxy
+  #       app.kubernetes.io/instance: athens-proxy
 
-  ## @param deployment.volumes Additional volumes to mount into the pods of the prometheus-exporter deployment.
+  ## @param deployment.volumes Additional volumes to mount into the pods of the athens-proxy deployment.
   volumes: []
   # - name: my-configmap-volume
   #   config:
@@ -517,13 +517,10 @@ networkPolicy:
   # - Egress
   # - Ingress
   egress: []
-  # Allow outgoing traffic to database host
+  # Allow outgoing HTTPS traffic to external go module servers
   #
-  # - to:
-  #   - ipBlock:
-  #       cidr: 192.168.179.1/32
-  #   ports:
-  #   - port: 5432
+  # - ports:
+  #   - port: 443
   #     protocol: TCP
 
   # Allow outgoing DNS traffic to the internal running DNS-Server. For example core-dns.
