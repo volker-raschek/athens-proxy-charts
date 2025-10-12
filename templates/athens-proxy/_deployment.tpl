@@ -13,13 +13,21 @@
 
 {{- define "athens-proxy.deployment.env" -}}
 {{- $env := .Values.deployment.athensProxy.env | default (list) }}
+
 {{- if and .Values.persistence.enabled }}
 {{- $env = concat $env (list (dict "name" "ATHENS_STORAGE_TYPE" "value" "disk") (dict "name" "ATHENS_DISK_STORAGE_ROOT" "value" .Values.persistence.data.mountPath)) }}
 {{- end }}
+
+{{- if .Values.config.downloadMode.enabled }}
+{{- $env = concat $env (list (dict "name" "ATHENS_DOWNLOAD_MODE" "value" "file:/etc/athens/config/download-mode.d/download-mode")) }}
+{{- end }}
+
 {{- if and (hasKey .Values.deployment.athensProxy.resources "limits") (hasKey .Values.deployment.athensProxy.resources.limits "cpu") }}
 {{- $env = concat $env (list (dict "name" "GOMAXPROCS" "valueFrom" (dict "resourceFieldRef" (dict "divisor" "1" "resource" "limits.cpu")))) }}
 {{- end }}
+
 {{ toYaml (dict "env" $env) }}
+
 {{- end -}}
 
 
@@ -64,6 +72,10 @@
 {{- $volumeMounts = concat $volumeMounts (list (dict "name" "data" "mountPath" .Values.persistence.data.mountPath)) }}
 {{- end }}
 
+{{/* volumes (download mode) */}}
+{{- if .Values.config.downloadMode.enabled }}
+{{- $volumeMounts = concat $volumeMounts (list (dict "name" "download-mode" "mountPath" "/etc/athens/config/download-mode.d" )) }}
+{{- end }}
 
 {{/* volumeMount (git config) */}}
 {{- if .Values.config.gitConfig.enabled }}
@@ -107,6 +119,8 @@
 {{- define "athens-proxy.deployment.volumes" -}}
 {{- $volumes := .Values.deployment.athensProxy.volumes | default (list) }}
 
+
+{{/* volumes (data) */}}
 {{- if .Values.persistence.enabled }}
 {{- $claimName := include "athens-proxy.persistentVolumeClaim.data.name" $ }}
 {{- if .Values.persistence.data.existingPersistentVolumeClaim.enabled }}
@@ -115,9 +129,21 @@
 {{- $volumes = concat $volumes (list (dict "name" "data" "persistentVolumeClaim" (dict "claimName" $claimName))) }}
 {{- end }}
 
+
+{{/* volumes (download mode) */}}
+{{- if .Values.config.downloadMode.enabled }}
+{{- $itemList := list (dict "key" "downloadMode" "path" "download-mode" "mode" 0644) }}
+{{- $configMapName := include "athens-proxy.configMap.downloadMode.name" $ }}
+{{- if and .Values.config.downloadMode.existingConfigMap.enabled (gt (len .Values.config.downloadMode.existingConfigMap.configMapName) 0) }}
+{{- $itemList = list (dict "key" .Values.config.downloadMode.existingConfigMap.downloadModeKey "path" "download-mode" "mode" 0644) }}
+{{- $configMapName = .Values.config.downloadMode.existingConfigMap.configMapName }}
+{{- end }}
+{{- $volumes = concat $volumes (list (dict "name" "download-mode" "configMap" (dict "name" $configMapName "items" $itemList))) }}
+{{- end }}
+
+
 {{/* volumes (git config) */}}
 {{- $projectedSecretSources := list -}}
-
 
 {{- if .Values.config.gitConfig.enabled }}
 {{- $itemList := list (dict "key" ".gitconfig" "path" ".gitconfig" "mode" 0644) }}

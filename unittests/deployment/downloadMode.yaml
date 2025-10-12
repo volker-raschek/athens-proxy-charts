@@ -1,0 +1,83 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: Deployment template
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/athens-proxy/deployment.yaml
+tests:
+- it: Rendering default without mounted download mode config map
+  asserts:
+    - notContains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_DOWNLOAD_MODE
+          value: file:/etc/athens/config/download-mode.d/download-mode
+    - notContains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: download-mode
+          mountPath: /etc/athens/config/download-mode.d
+    - notContains:
+        path: spec.template.spec.volumes
+        content:
+          name: download-mode
+          configMap:
+            name: athens-proxy-unittest-download-mode-file
+
+- it: Rendering default with mounted gitconfig configMap
+  set:
+    config.downloadMode.enabled: true
+    persistence.enabled: true
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_DOWNLOAD_MODE
+          value: file:/etc/athens/config/download-mode.d/download-mode
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: download-mode
+          mountPath: /etc/athens/config/download-mode.d
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: download-mode
+          configMap:
+            items:
+              - key: downloadMode
+                mode: 0644
+                path: download-mode
+            name: athens-proxy-unittest-download-mode-file
+
+- it: Rendering with custom download mode configMap
+  set:
+    config.downloadMode.enabled: true
+    config.downloadMode.existingConfigMap.enabled: true
+    config.downloadMode.existingConfigMap.configMapName: "my-custom-configmap"
+    config.downloadMode.existingConfigMap.downloadModeKey: "my-custom-download-mode-filename-key"
+    persistence.enabled: true
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_DOWNLOAD_MODE
+          value: file:/etc/athens/config/download-mode.d/download-mode
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: download-mode
+          mountPath: /etc/athens/config/download-mode.d
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: download-mode
+          configMap:
+            items:
+            - key: "my-custom-download-mode-filename-key"
+              path: "download-mode"
+              mode: 0644
+            name: my-custom-configmap

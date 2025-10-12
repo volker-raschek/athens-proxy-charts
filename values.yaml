@@ -25,7 +25,6 @@ config:
         # ATHENS_AZURE_ACCOUNT_NAME:
         # ATHENS_AZURE_CONTAINER_NAME:
         # ATHENS_CLOUD_RUNTIME:
-        # ATHENS_DOWNLOAD_MODE:
         # ATHENS_DOWNLOAD_URL:
         # ATHENS_ETCD_ENDPOINTS:
         # ATHENS_EXTERNAL_STORAGE_URL:
@@ -96,15 +95,20 @@ config:
         # PROXY_FORCE_SSL:
 
   downloadMode:
-    ## @param config.downloadMode.existingConfigMap.enabled TODO:
-    ## @param config.downloadMode.existingConfigMap.secretName TODO:
+    ## @param config.downloadMode.enabled Enable mounting of a download mode file into the container file system. If enabled, the env `ATHENS_DOWNLOAD_MODE` will automatically be defined.
+    enabled: false
+
+    ## @param config.downloadMode.existingConfigMap.enabled Enable to use an external config map for mounting the download mode file.
+    ## @param config.downloadMode.existingConfigMap.configMapName The name of the existing config map which should be used to mount the download mode file.
+    ## @param config.downloadMode.existingConfigMap.downloadModeKey The name of the key inside the config map where the content of the download mode file is stored.
     existingConfigMap:
       enabled: false
-      secretName: ""
+      configMapName: ""
+      downloadModeKey: "downloadMode"
 
     ## @param config.downloadMode.configMap.annotations Additional annotations of the config map containing the download mode file.
     ## @param config.downloadMode.configMap.labels Additional labels of the config map containing the download mode file.
-    ## @param config.downloadMode.configMap.content Additional labels of the config map containing the download mode file.
+    ## @param config.downloadMode.configMap.content The content of the download mode file.
     configMap:
       annotations: {}
       labels: {}
@@ -138,8 +142,8 @@ config:
       configMapName: ""
       gitConfigKey:
 
-    ## @param config.gitConfig.configMap.annotations Additional annotations of the config map containing the download mode file.
-    ## @param config.gitConfig.configMap.labels Additional labels of the config map containing the download mode file.
+    ## @param config.gitConfig.configMap.annotations Additional annotations of the config map containing the .gitconfig file.
+    ## @param config.gitConfig.configMap.labels Additional labels of the config map containing the .gitconfig file.
     ## @param config.gitConfig.configMap.content The content of the .gitconfig file.
     configMap:
       annotations: {}
@@ -474,10 +478,17 @@ persistence:
     ## @param persistence.data.mountPath The path where the persistent volume should be mounted in the container file system. This variable controls `ATHENS_DISK_STORAGE_ROOT`.
     mountPath: "/var/www/athens-proxy/data"
 
+    ## @param persistence.data.existingPersistentVolumeClaim.enabled TODO
+    ## @param persistence.data.existingPersistentVolumeClaim.persistentVolumeClaimName TODO
     existingPersistentVolumeClaim:
       enabled: false
       persistentVolumeClaimName: ""
 
+    ## @param persistence.data.persistentVolumeClaim.annotations Additional persistent volume claim annotations.
+    ## @param persistence.data.persistentVolumeClaim.labels Additional persistent volume claim labels.
+    ## @param persistence.data.persistentVolumeClaim.accessModes Access modes of the persistent volume claim.
+    ## @param persistence.data.persistentVolumeClaim.storageClass Storage class of the persistent volume claim.
+    ## @param persistence.data.persistentVolumeClaim.storageSize Size of the persistent volume claim.
     persistentVolumeClaim:
       annotations: {}
       labels: {}

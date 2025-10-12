@@ -34,6 +34,10 @@
 
 {{/* name */}}
 
+{{- define "athens-proxy.configMap.downloadMode.name" -}}
+{{ include "athens-proxy.fullname" . }}-download-mode-file
+{{- end }}
+
 {{- define "athens-proxy.configMap.gitConfig.name" -}}
 {{ include "athens-proxy.fullname" . }}-gitconfig
 {{- end }}
