@@ -185,18 +185,32 @@ config:
         # machine api.github.com  [octocat]  password  [PAT]
 
   ssh:
-    ## @param config.ssh.existingSecret.enabled TODO:.
-    ## @param config.ssh.existingSecret.secretName TODO:
+    ## @param config.ssh.enabled Enable mounting of a .netrc file into the container file system.
+    enabled: false
+
+    ## @param config.ssh.existingSecret.enabled Enable to use an external secret for mounting the public and private SSH key files.
+    ## @param config.ssh.existingSecret.secretName The name of the existing secret which should be used to mount the public and private SSH key files.
+    ## @param config.ssh.existingSecret.configKey The name of the key inside the secret where the content of the SSH client config file is stored.
+    ## @param config.ssh.existingSecret.id_ed25519Key The name of the key inside the secret where the content of the id_ed25519 key file is stored.
+    ## @param config.ssh.existingSecret.id_ed25519PubKey The name of the key inside the secret where the content of the id_ed25519.pub key file is stored.
+    ## @param config.ssh.existingSecret.id_rsaKey The name of the key inside the secret where the content of the id_rsa key file is stored.
+    ## @param config.ssh.existingSecret.id_rsaPubKey The name of the key inside the secret where the content of the id_ed25519.pub key file is stored.
     existingSecret:
       enabled: false
+      secretName: ""
+      configKey: "config"
+      id_ed25519Key: "id_ed25519"
+      id_ed25519PubKey: "id_ed25519.pub"
+      id_rsaKey: "id_rsa"
+      id_rsaPubKey: "id_rsa.pub"
 
-    ## @param config.ssh.secret.annotations Additional annotations of the secret containing the database credentials.
-    ## @param config.ssh.secret.labels Additional labels of the secret containing the database credentials.
-    ## @param config.ssh.secret.files TODO:
-    ## @skip config.ssh.secret.id_ed25519 TODO:
-    ## @skip config.ssh.secret.id_ed25519_pub TODO:
-    ## @skip config.ssh.secret.id_rsa TODO:
-    ## @skip config.ssh.secret.id_rsa_pub TODO:
+    ## @param config.ssh.secret.annotations Additional annotations of the secret containing the public and private SSH key files.
+    ## @param config.ssh.secret.labels Additional labels of the secret containing the public and private SSH key files.
+    ## @param config.ssh.secret.config The content of the SSH client config file.
+    ## @skip config.ssh.secret.id_ed25519 The content of the private SSH ed25519 key.
+    ## @skip config.ssh.secret.id_ed25519_pub The content of the public SSH ed25519 key.
+    ## @skip config.ssh.secret.id_rsa The content of the private SSH RSA key.
+    ## @skip config.ssh.secret.id_rsa_pub The content of the public SSH RSA key.
     secret:
       annotations: {}
       labels: {}
