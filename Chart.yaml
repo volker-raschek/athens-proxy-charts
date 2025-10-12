@@ -22,7 +22,3 @@ sources:
 - https://github.com/volker-raschek/athens-proxy-charts
 - https://github.com/gomods/athens
 - https://hub.docker.com/r/gomods/athens
-
-maintainers:
-- name: Markus Pesch
-  email: markus.pesch+apps@cryptic.systems
