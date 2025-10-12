@@ -135,7 +135,7 @@ config:
     ## @param config.gitConfig.existingConfigMap.gitConfigKey The name of the key inside the config map where the content of the .gitconfig file is stored.
     existingConfigMap:
       enabled: false
-      secretName: ""
+      configMapName: ""
       gitConfigKey:
 
     ## @param config.gitConfig.configMap.annotations Additional annotations of the config map containing the download mode file.

@@ -64,6 +64,10 @@
 {{- $volumeMounts = concat $volumeMounts (list (dict "name" "data" "mountPath" .Values.persistence.data.mountPath)) }}
 {{- end }}
 
+{{- if .Values.config.gitConfig.enabled }}
+{{- $volumeMounts = concat $volumeMounts (list (dict "name" "secrets" "mountPath" "/root/.gitconfig" "subPath" ".gitconfig" )) }}
+{{- end }}
+
 {{- if .Values.config.netrc.enabled }}
 {{- $volumeMounts = concat $volumeMounts (list (dict "name" "secrets" "mountPath" "/root/.netrc" "subPath" ".netrc" )) }}
 {{- end }}
@@ -84,9 +88,21 @@
 {{- $volumes = concat $volumes (list (dict "name" "data" "persistentVolumeClaim" (dict "claimName" $claimName))) }}
 {{- end }}
 
+{{- if .Values.config.gitConfig.enabled }}
+{{- $projectedSources := list -}}
+{{- $itemList := list (dict "key" ".gitconfig" "path" ".gitconfig" "mode" 0644) }}
+{{- $configMapName := include "athens-proxy.configMap.gitConfig.name" . }}
+{{- if .Values.config.gitConfig.existingConfigMap.enabled }}
+{{- $itemList = list (dict "key" .Values.config.gitConfig.existingConfigMap.gitConfigKey "path" ".gitconfig" "mode" 0644) }}
+{{- $configMapName = .Values.config.gitConfig.existingConfigMap.configMapName }}
+{{- end }}
+{{- $projectedSources = concat $projectedSources (list (dict "configMap" (dict "name" $configMapName "items" $itemList))) }}
+
+{{- $volumes = concat $volumes (list (dict "name" "secrets" "projected" (dict "sources" $projectedSources)))}}
+{{- end }}
+
 {{- if .Values.config.netrc.enabled }}
 {{- $projectedSources := list -}}
-
 {{- $itemList := list (dict "key" ".netrc" "path" ".netrc" "mode" 0600) }}
 {{- $secretName := include "athens-proxy.secrets.netrc.name" . }}
 {{- if .Values.config.netrc.existingSecret.enabled }}
@@ -94,7 +110,6 @@
 {{- $secretName = .Values.config.netrc.existingSecret.secretName }}
 {{- end }}
 {{- $projectedSources = concat $projectedSources (list (dict "secret" (dict "name" $secretName "items" $itemList))) }}
-
 
 {{- $volumes = concat $volumes (list (dict "name" "secrets" "projected" (dict "sources" $projectedSources)))}}
 {{- end }}

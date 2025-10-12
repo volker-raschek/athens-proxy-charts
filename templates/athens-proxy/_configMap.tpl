@@ -31,3 +31,9 @@
 {{ toYaml .Values.config.gitConfig.configMap.labels }}
 {{- end }}
 {{- end }}
+
+{{/* name */}}
+
+{{- define "athens-proxy.configMap.gitConfig.name" -}}
+{{ include "athens-proxy.fullname" . }}-gitconfig
+{{- end }}

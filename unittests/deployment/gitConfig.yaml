@@ -1,0 +1,81 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: Deployment template
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/athens-proxy/deployment.yaml
+tests:
+- it: Rendering default without mounted git config map
+  asserts:
+    - notContains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: secrets
+          mountPath: /root/.gitconfig
+          subPath: .gitconfig
+    - notContains:
+        path: spec.template.spec.volumes
+        content:
+          name: secrets
+          projected:
+            sources:
+            - configMap:
+                items:
+                - key: .gitconfig
+                  path: .gitconfig
+                  mode: 0600
+                name: athens-proxy-unittest-gitconfig
+
+- it: Rendering default with mounted gitconfig configMap
+  set:
+    config.gitConfig.enabled: true
+    persistence.enabled: true
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: secrets
+          mountPath: /root/.gitconfig
+          subPath: .gitconfig
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: secrets
+          projected:
+            sources:
+            - configMap:
+                items:
+                - key: .gitconfig
+                  path: .gitconfig
+                  mode: 0644
+                name: athens-proxy-unittest-gitconfig
+
+- it: Rendering with custom gitconfig configMap
+  set:
+    config.gitConfig.enabled: true
+    config.gitConfig.existingConfigMap.enabled: true
+    config.gitConfig.existingConfigMap.configMapName: "my-custom-configmap"
+    config.gitConfig.existingConfigMap.gitConfigKey: "my-gitconfig-key"
+    persistence.enabled: true
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: secrets
+          mountPath: /root/.gitconfig
+          subPath: .gitconfig
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: secrets
+          projected:
+            sources:
+            - configMap:
+                items:
+                - key: my-gitconfig-key
+                  path: .gitconfig
+                  mode: 0644
+                name: my-custom-configmap
