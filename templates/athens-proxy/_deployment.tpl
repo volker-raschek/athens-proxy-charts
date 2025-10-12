@@ -42,7 +42,7 @@
 {{- $registry := .Values.deployment.athensProxy.image.registry -}}
 {{- $repository := .Values.deployment.athensProxy.image.repository -}}
 {{- $tag := default .Chart.AppVersion .Values.deployment.athensProxy.image.tag -}}
-{{- printf "%s/%s:v%s" $registry $repository $tag -}}
+{{- printf "%s/%s:%s" $registry $repository $tag -}}
 {{- end -}}
 
 {{/* labels */}}

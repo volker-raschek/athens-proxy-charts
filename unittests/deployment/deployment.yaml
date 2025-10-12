@@ -61,7 +61,7 @@ tests:
     template: templates/athens-proxy/deployment.yaml
   - equal:
       path: spec.template.spec.containers[0].image
-      value: docker.io/gomods/athens:v0.1.0
+      value: docker.io/gomods/athens:0.1.0
     template: templates/athens-proxy/deployment.yaml
   - equal:
       path: spec.template.spec.containers[0].imagePullPolicy
@@ -206,7 +206,7 @@ tests:
   asserts:
   - equal:
       path: spec.template.spec.containers[0].image
-      value: registry.example.local/path/special/athens-proxy:v0.1.0
+      value: registry.example.local/path/special/athens-proxy:0.1.0
     template: templates/athens-proxy/deployment.yaml
 
 - it: Test custom imagePullPolicy
@@ -463,4 +463,3 @@ tests:
       - name: data
         mountPath: /usr/lib/athens-proxy/data
     template: templates/athens-proxy/deployment.yaml
-
