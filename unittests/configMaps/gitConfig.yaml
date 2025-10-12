@@ -34,8 +34,15 @@ tests:
         app.kubernetes.io/name: athens-proxy
         app.kubernetes.io/version: 0.1.0
         helm.sh/chart: athens-proxy-0.1.0
-  - isNullOrEmpty:
+  - equal:
       path: data[".gitconfig"]
+      value: |
+        # The .gitconfig file
+        #
+        # The .gitconfig file contains the user specific git configuration. It generally resides in the user's home
+        # directory.
+        #
+        # [url "git@github.com:"] insteadOf = https://github.com/
 
 - it: Rendering custom annotations and labels.
   set:
@@ -65,7 +72,6 @@ tests:
 
       [url "git@git.cryptic.systems:"]
       insteadOf = https://git.cryptic.systems/
-
   asserts:
   - equal:
       path: data[".gitconfig"]
