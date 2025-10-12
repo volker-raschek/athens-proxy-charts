@@ -1,4 +1,4 @@
-{{- if not .Values.config.downloadMode.existingConfigMap.enabled }}
+{{- if and .Values.config.downloadMode.enabled (not .Values.config.downloadMode.existingConfigMap.enabled) }}
 ---
 apiVersion: v1
 kind: ConfigMap

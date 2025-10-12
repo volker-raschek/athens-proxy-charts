@@ -8,14 +8,22 @@ release:
 templates:
 - templates/configMapDownloadMode.yaml
 tests:
+- it: Skip rending by default.
+  asserts:
+  - hasDocuments:
+      count: 0
+
 - it: Skip rending by using existing config map.
   set:
+    config.downloadMode.enabled: true
     config.downloadMode.existingConfigMap.enabled: true
   asserts:
   - hasDocuments:
       count: 0
 
-- it: Rendering by default.
+- it: Rendering with default values
+  set:
+    config.downloadMode.enabled: true
   asserts:
   - hasDocuments:
       count: 1
@@ -56,6 +64,7 @@ tests:
 
 - it: Rendering custom annotations and labels.
   set:
+    config.downloadMode.enabled: true
     config.downloadMode.configMap.annotations:
       foo: bar
       bar: foo
@@ -76,6 +85,7 @@ tests:
 
 - it: Rendering custom configuration
   set:
+    config.downloadMode.enabled: true
     config.downloadMode.configMap.content: |
       downloadURL = "https://proxy.golang.org"
       mode = "async_redirect"

@@ -8,14 +8,22 @@ release:
 templates:
 - templates/configMapGitConfig.yaml
 tests:
+- it: Skip rending by default.
+  asserts:
+  - hasDocuments:
+      count: 0
+
 - it: Skip rending by using existing config map.
   set:
+    config.gitConfig.enabled: true
     config.gitConfig.existingConfigMap.enabled: true
   asserts:
   - hasDocuments:
       count: 0
 
 - it: Rendering by default.
+  set:
+    config.gitConfig.enabled: true
   asserts:
   - hasDocuments:
       count: 1
@@ -46,6 +54,7 @@ tests:
 
 - it: Rendering custom annotations and labels.
   set:
+    config.gitConfig.enabled: true
     config.gitConfig.configMap.annotations:
       foo: bar
       bar: foo
@@ -66,6 +75,7 @@ tests:
 
 - it: Rendering custom configuration
   set:
+    config.gitConfig.enabled: true
     config.gitConfig.configMap.content: |
       [url "git@github.com:"]
       insteadOf = https://github.com/
