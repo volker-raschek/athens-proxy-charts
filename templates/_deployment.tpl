@@ -26,6 +26,13 @@
 {{- $env = concat $env (list (dict "name" "GOMAXPROCS" "valueFrom" (dict "resourceFieldRef" (dict "divisor" "1" "resource" "limits.cpu")))) }}
 {{- end }}
 
+{{- if .Values.certificate.enabled }}
+{{- $env = concat $env (list
+      (dict "name" "ATHENS_TLSCERT_FILE" "value" "/etc/athens-proxy/tls/tls.crt")
+      (dict "name" "ATHENS_TLSKEY_FILE" "value" "/etc/athens-proxy/tls/tls.key")
+    ) }}
+{{- end }}
+
 {{ toYaml (dict "env" $env) }}
 
 {{- end -}}
@@ -122,6 +129,12 @@
 {{- $volumeMounts = concat $volumeMounts (list (dict "name" "secrets" "mountPath" "/root/.ssh/id_rsa.pub" "subPath" "id_rsa.pub" )) }}
 {{- end }}
 
+{{- end }}
+
+
+{{/* volumeMounts (tls) */}}
+{{- if .Values.certificate.enabled }}
+{{- $volumeMounts = concat $volumeMounts (list (dict "name" "tls" "mountPath" "/etc/athens-proxy/tls" )) }}
 {{- end }}
 
 {{ toYaml (dict "volumeMounts" $volumeMounts) }}
@@ -251,6 +264,16 @@
 {{- $projectedSecretVolume := dict "name" "secrets" "projected" (dict "sources" $projectedSecretSources) }}
 {{- $volumes = concat $volumes (list $projectedSecretVolume) }}
 {{- end }}
+
+{{/* volumes (tls) */}}
+{{- if .Values.certificate.enabled }}
+{{- $secretName := include "athens-proxy.certificates.server.name" $ }}
+{{- if .Values.certificate.existingSecret.enabled }}
+{{- $secretName := .Values.certificate.existingSecret.secretName }}
+{{- end }}
+{{- $volumes = concat $volumes (list (dict "name" "tls" "secret" (dict "secretName" $secretName))) }}
+{{- end }}
+
 
 {{ toYaml (dict "volumes" $volumes) }}
 {{- end -}}

@@ -1,0 +1,87 @@
+{{- if and .Values.certificate.enabled (not .Values.certificate.existingSecret.enabled) -}}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  {{- with (include "athens-proxy.certificates.server.annotations" . | fromYaml) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with (include "athens-proxy.certificates.server.labels" . | fromYaml) }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ include "athens-proxy.certificates.server.name" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  commonName: {{ include "athens-proxy.fullname" . }}
+  {{- if empty .Values.certificate.new.dnsNames }}
+  dnsNames:
+  - {{ include "athens-proxy.fullname" . }}
+  - {{ include "athens-proxy.fullname" . }}.{{ .Release.Namespace }}
+  - {{ include "athens-proxy.fullname" . }}.{{ .Release.Namespace }}.svc
+  - {{ include "athens-proxy.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+  {{- else }}
+  dnsNames:
+  {{- range .Values.certificate.new.dnsNames }}
+  - {{ . }}
+  {{- end }}
+  {{- end }}
+  duration: {{ .Values.certificate.new.duration }}
+  {{- if not (empty .Values.certificate.new.ipAddresses) }}
+  ipAddresses:
+  {{- range .Values.certificate.new.ipAddresses }}
+  - {{ . }}
+  {{- end }}
+  {{- end }}
+  isCA: false
+  issuerRef:
+    kind: {{ required "No certificate issuer kind defined!" .Values.certificate.new.issuerRef.kind }}
+    name: {{ required "No certificate issuer name defined!" .Values.certificate.new.issuerRef.name }}
+  privateKey:
+    algorithm: {{ .Values.certificate.new.privateKey.algorithm }}
+    rotationPolicy: {{ .Values.certificate.new.privateKey.rotationPolicy }}
+    size: {{ .Values.certificate.new.privateKey.size }}
+  renewBefore: {{ .Values.certificate.new.renewBefore }}
+  secretName: {{ include "athens-proxy.certificates.server.name" . }}
+  {{- with .Values.certificate.new.secretTemplate }}
+  secretTemplate:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  subject:
+    {{- with .Values.certificate.new.subject.countries }}
+    countries:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.certificate.new.subject.localities }}
+    localities:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.certificate.new.subject.organizationalUnits }}
+    organizationalUnits:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.certificate.new.subject.organizations }}
+    organizations:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.certificate.new.subject.postalCodes }}
+    postalCodes:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.certificate.new.subject.provinces }}
+    provinces:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.certificate.new.subject.serialNumber }}
+    serialNumber: {{ .Values.certificate.new.subject.serialNumber }}
+    {{- end }}
+    {{- with .Values.certificate.new.subject.streetAddresses }}
+    streetAddresses:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  usages:
+  {{- range .Values.certificate.new.usages }}
+  - {{ . }}
+  {{- end }}
+{{- end }}

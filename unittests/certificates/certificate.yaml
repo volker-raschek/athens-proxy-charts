@@ -1,0 +1,300 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: Certificate athens-proxy template
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/certificate.yaml
+tests:
+- it: Skip rendering by default.
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering for existing certificate
+  set:
+    certificate.enabled: true
+    certificate.existingSecret.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Throw error when issuerKind and IssuerName is not defined
+  set:
+    certificate.enabled: true
+  asserts:
+  - failedTemplate:
+      errorMessage: "No certificate issuer kind defined!"
+
+- it: Throw error when issuerKind and IssuerName is not defined
+  set:
+    certificate.enabled: true
+  asserts:
+  - failedTemplate: {}
+
+- it: Throw error when issuerKind not defined
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.name: "my-issuer"
+  asserts:
+  - failedTemplate:
+      errorMessage: "No certificate issuer kind defined!"
+
+- it: Throw error when issuerName not defined
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: "ClusterIssuer"
+  asserts:
+  - failedTemplate:
+      errorMessage: "No certificate issuer name defined!"
+
+- it: Rendering Certificate object when certificate.enabled=true (default)
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      name: athens-proxy-unittest-tls
+      namespace: testing
+  - equal:
+      path: spec.commonName
+      value: athens-proxy-unittest
+  - equal:
+      path: spec.duration
+      value: 744h
+  - equal:
+      path: spec.dnsNames
+      value: [ "athens-proxy-unittest", "athens-proxy-unittest.testing", "athens-proxy-unittest.testing.svc", "athens-proxy-unittest.testing.svc.cluster.local" ]
+  - notExists:
+      path: spec.ipAddresses
+  - equal:
+      path: spec.isCA
+      value: false
+  - equal:
+      path: spec.issuerRef.kind
+      value: ClusterIssuer
+  - equal:
+      path: spec.issuerRef.name
+      value: my-issuer
+  - equal:
+      path: spec.privateKey.algorithm
+      value: RSA
+  - equal:
+      path: spec.privateKey.size
+      value: 4096
+  - equal:
+      path: spec.privateKey.rotationPolicy
+      value: Never
+  - equal:
+      path: spec.secretName
+      value: athens-proxy-unittest-tls
+  - exists:
+      path: spec.secretTemplate.annotations
+  - exists:
+      path: spec.secretTemplate.labels
+  - exists:
+      path: spec.subject
+  - notExists:
+      path: spec.subject.countries
+  - notExists:
+      path: spec.subject.localities
+  - notExists:
+      path: spec.subject.organizationalUnits
+  - notExists:
+      path: spec.subject.organizations
+  - notExists:
+      path: spec.subject.postalCodes
+  - notExists:
+      path: spec.subject.provinces
+  - notExists:
+      path: spec.subject.serialNumber
+  - notExists:
+      path: spec.subject.streetAddresses
+  - equal:
+      path: spec.renewBefore
+      value: 672h
+  - equal:
+      path: spec.usages
+      value: [ "client auth", "server auth" ]
+
+# metadata.annotations
+- it: Rendering Certificate object with additional annotations and labels
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+    certificate.new.annotations:
+      foo: bar
+    certificate.new.labels:
+      bar: foo
+  asserts:
+  - isSubset:
+      path: metadata.annotations
+      content:
+        foo: bar
+  - isSubset:
+      path: metadata.labels
+      content:
+        bar: foo
+
+# spec.duration
+- it: Rendering Certificate object with custom `.Values.certificate.new.duration`.
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+    certificate.new.duration: 3000h
+  asserts:
+  - equal:
+      path: spec.duration
+      value: 3000h
+
+# spec.dnsNames
+- it: Rendering Certificate object with custom `.Values.certificate.new.dnsNames`.
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+    certificate.new.dnsNames: [ "app", "app.example.local" ]
+  asserts:
+  - equal:
+      path: spec.dnsNames
+      value: [ "app", "app.example.local" ]
+
+# spec.dnsNames
+- it: Rendering Certificate object with custom `.Values.clusterDomain` as domain.
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+    clusterDomain: k8s.example.local
+  asserts:
+  - contains:
+      path: spec.dnsNames
+      content:
+        athens-proxy-unittest.testing.svc.k8s.example.local
+      count: 1
+
+# spec.ipAddresses
+- it: RRendering Certificate object with custom `.Values.certificate.new.ipAddresses`.
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+    certificate.new.ipAddresses: [ "10.11.12.13", "fe00:xxyy:xxyy" ]
+  asserts:
+  - equal:
+      path: spec.ipAddresses
+      value: [ "10.11.12.13", "fe00:xxyy:xxyy" ]
+
+# spec.privateKey
+- it: Rendering Certificate object with custom `.Values.certificate.new.privateKey` values.
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+    certificate.new.privateKey.algorithm: ED25519
+    certificate.new.privateKey.rotationPolicy: Never
+    certificate.new.privateKey.size: 512
+  asserts:
+  - equal:
+      path: spec.privateKey.algorithm
+      value: ED25519
+  - equal:
+      path: spec.privateKey.rotationPolicy
+      value: Never
+  - equal:
+      path: spec.privateKey.size
+      value: 512
+
+# spec.renewBefore
+- it: Rendering Certificate object with custom `.Values.certificate.new.renewBefore`.
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+    certificate.new.renewBefore: 2000h
+  asserts:
+  - equal:
+      path: spec.renewBefore
+      value: 2000h
+
+# spec.secretTemplate
+- it: Rendering Certificate object with custom `.Values.certificate.new.secretTemplate` values.
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+    certificate.new.secretTemplate:
+      annotations:
+        foo: bar
+      labels:
+        bar: foo
+  asserts:
+  - equal:
+      path: spec.secretTemplate.annotations
+      value:
+        foo: bar
+  - equal:
+      path: spec.secretTemplate.labels
+      value:
+        bar: foo
+
+# spec.secretTemplate
+- it: Rendering Certificate object with custom `.Values.certificate.new.subject` values.
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+    certificate.new.subject.countries: [ "Country" ]
+    certificate.new.subject.localities: [ "City" ]
+    certificate.new.subject.organizationalUnits: [ "IT department" ]
+    certificate.new.subject.organizations: [ "My organization" ]
+    certificate.new.subject.postalCodes: [ "AB12345", "12345AB" ]
+    certificate.new.subject.provinces: [ "Provinces" ]
+    certificate.new.subject.serialNumber: "MyNumber"
+    certificate.new.subject.streetAddresses: [ "ExampleStreet 1", "StreetExample 2" ]
+  asserts:
+  - equal:
+      path: spec.subject.countries
+      value: [ "Country" ]
+  - equal:
+      path: spec.subject.localities
+      value: [ "City" ]
+  - equal:
+      path: spec.subject.organizationalUnits
+      value: [ "IT department" ]
+  - equal:
+      path: spec.subject.organizations
+      value: [ "My organization" ]
+  - equal:
+      path: spec.subject.postalCodes
+      value: [ "AB12345", "12345AB" ]
+  - equal:
+      path: spec.subject.provinces
+      value: [ "Provinces" ]
+  - equal:
+      path: spec.subject.serialNumber
+      value: "MyNumber"
+  - equal:
+      path: spec.subject.streetAddresses
+      value: [ "ExampleStreet 1", "StreetExample 2" ]
+
+# spec.usages
+- it: Rendering Certificate object with custom `.Values.certificate.new.usages`.
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: my-issuer
+    certificate.new.usages: [ "client auth" ]
+  asserts:
+  - equal:
+      path: spec.usages
+      value: [ "client auth" ]

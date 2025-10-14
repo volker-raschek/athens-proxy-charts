@@ -181,6 +181,36 @@ annotations with the prefix `checksum`.
 | `nameOverride`     | Individual release name suffix.           | `""`  |
 | `fullnameOverride` | Override the complete release name logic. | `""`  |
 
+### Certificate
+
+| Name                                          | Description                                                                                                                                                 | Value                           |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| `certificate.enabled`                         | Issue a TLS certificate via cert-manager. If enabled, the environment variables `ATHENS_TLSCERT_FILE` and `ATHENS_TLSKEY_FILE` will be automatically added. | `false`                         |
+| `certificate.existingSecret.enabled`          | Use an existing secret of the type `kubernetes.io/tls`.                                                                                                     | `false`                         |
+| `certificate.existingSecret.secretName`       | Name of the secret containing the TLS certificate and private key.                                                                                          | `""`                            |
+| `certificate.new.annotations`                 | Additional certificate annotations.                                                                                                                         | `{}`                            |
+| `certificate.new.labels`                      | Additional certificate labels.                                                                                                                              | `{}`                            |
+| `certificate.new.duration`                    | Duration of the TLS certificate.                                                                                                                            | `744h`                          |
+| `certificate.new.renewBefore`                 | Renew TLS certificate before expiring.                                                                                                                      | `672h`                          |
+| `certificate.new.dnsNames`                    | Overwrites the default of the subject alternative DNS names.                                                                                                | `[]`                            |
+| `certificate.new.ipAddresses`                 | Overwrites the default of the subject alternative IP addresses.                                                                                             | `[]`                            |
+| `certificate.new.issuerRef.kind`              | Issuer kind. Can be `Issuer` or `ClusterIssuer`.                                                                                                            | `""`                            |
+| `certificate.new.issuerRef.name`              | Name of the `Issuer` or `ClusterIssuer`.                                                                                                                    | `""`                            |
+| `certificate.new.privateKey.algorithm`        | Algorithm of the private TLS key.                                                                                                                           | `RSA`                           |
+| `certificate.new.privateKey.rotationPolicy`   | Rotation of the private TLS key.                                                                                                                            | `Never`                         |
+| `certificate.new.privateKey.size`             | Size of the private TLS key.                                                                                                                                | `4096`                          |
+| `certificate.new.secretTemplate.annotations`  | Additional annotation of the created secret.                                                                                                                | `{}`                            |
+| `certificate.new.secretTemplate.labels`       | Additional labels of the created secret.                                                                                                                    | `{}`                            |
+| `certificate.new.subject.countries`           | List of countries.                                                                                                                                          | `[]`                            |
+| `certificate.new.subject.localities`          | List of localities.                                                                                                                                         | `[]`                            |
+| `certificate.new.subject.organizationalUnits` | List of organizationalUnits.                                                                                                                                | `[]`                            |
+| `certificate.new.subject.organizations`       | List of organizations.                                                                                                                                      | `[]`                            |
+| `certificate.new.subject.postalCodes`         | List of postalCodes.                                                                                                                                        | `[]`                            |
+| `certificate.new.subject.provinces`           | List of provinces.                                                                                                                                          | `[]`                            |
+| `certificate.new.subject.serialNumber`        | Serial number.                                                                                                                                              | `""`                            |
+| `certificate.new.subject.streetAddresses`     | List of streetAddresses.                                                                                                                                    | `[]`                            |
+| `certificate.new.usages`                      | Define the usage of the TLS key.                                                                                                                            | `["client auth","server auth"]` |
+
 ### Configuration
 
 | Name                                                    | Description                                                                                                                                       | Value            |
@@ -292,8 +322,14 @@ annotations with the prefix `checksum`.
 | `persistence.data.persistentVolumeClaim.annotations`                       | Additional persistent volume claim annotations.                                                                                                                                                                         | `{}`                         |
 | `persistence.data.persistentVolumeClaim.labels`                            | Additional persistent volume claim labels.                                                                                                                                                                              | `{}`                         |
 | `persistence.data.persistentVolumeClaim.accessModes`                       | Access modes of the persistent volume claim.                                                                                                                                                                            | `["ReadWriteMany"]`          |
-| `persistence.data.persistentVolumeClaim.storageClass`                      | Storage class of the persistent volume claim.                                                                                                                                                                           | `""`                         |
+| `persistence.data.persistentVolumeClaim.storageClassName`                  | Storage class of the persistent volume claim.                                                                                                                                                                           | `""`                         |
 | `persistence.data.persistentVolumeClaim.storageSize`                       | Size of the persistent volume claim.                                                                                                                                                                                    | `5Gi`                        |
+
+### Network
+
+| Name            | Description                                                              | Value           |
+| --------------- | ------------------------------------------------------------------------ | --------------- |
+| `clusterDomain` | Domain of the Cluster. Domain is part of internally issued certificates. | `cluster.local` |
 
 ### Network Policy
 

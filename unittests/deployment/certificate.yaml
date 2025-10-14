@@ -1,0 +1,73 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: Deployment template
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/configMapDownloadMode.yaml
+- templates/configMapGitConfig.yaml
+- templates/deployment.yaml
+- templates/secretNetRC.yaml
+- templates/secretSSH.yaml
+tests:
+- it: Rendering default without tls config
+  asserts:
+    - notContains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_TLSCERT_FILE
+          value: /etc/athens-proxy/tls/tls.crt
+      template: templates/deployment.yaml
+    - notContains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_TLSKEY_FILE
+          value: /etc/athens-proxy/tls/tls.key
+      template: templates/deployment.yaml
+    - notContains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: tls
+          mountPath: /etc/athens-proxy/tls
+      template: templates/deployment.yaml
+    - notContains:
+        path: spec.template.spec.volumes
+        content:
+          name: tls
+          secretRef:
+            name: athens-proxy-unittest-tls
+      template: templates/deployment.yaml
+
+- it: Rendering with tls config
+  set:
+    certificate.enabled: true
+    certificate.new.issuerRef.kind: ClusterIssuer
+    certificate.new.issuerRef.name: MyIssuer
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_TLSCERT_FILE
+          value: /etc/athens-proxy/tls/tls.crt
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_TLSKEY_FILE
+          value: /etc/athens-proxy/tls/tls.key
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: tls
+          mountPath: /etc/athens-proxy/tls
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: tls
+          secret:
+            secretName: athens-proxy-unittest-tls
+      template: templates/deployment.yaml

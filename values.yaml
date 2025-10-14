@@ -5,6 +5,77 @@
 nameOverride: ""
 fullnameOverride: ""
 
+## @section Certificate
+certificate:
+  ## @param certificate.enabled Issue a TLS certificate via cert-manager. If enabled, the environment variables `ATHENS_TLSCERT_FILE` and `ATHENS_TLSKEY_FILE` will be automatically added.
+  enabled: false
+
+  ## @param certificate.existingSecret.enabled Use an existing secret of the type `kubernetes.io/tls`.
+  ## @param certificate.existingSecret.secretName Name of the secret containing the TLS certificate and private key.
+  existingSecret:
+    enabled: false
+    secretName: ""
+
+  ## @param certificate.new.annotations Additional certificate annotations.
+  ## @param certificate.new.labels Additional certificate labels.
+  ## @param certificate.new.duration Duration of the TLS certificate.
+  ## @param certificate.new.renewBefore Renew TLS certificate before expiring.
+  ## @param certificate.new.dnsNames Overwrites the default of the subject alternative DNS names.
+  ## @param certificate.new.ipAddresses Overwrites the default of the subject alternative IP addresses.
+  ## @param certificate.new.issuerRef.kind Issuer kind. Can be `Issuer` or `ClusterIssuer`.
+  ## @param certificate.new.issuerRef.name Name of the `Issuer` or `ClusterIssuer`.
+  ## @param certificate.new.privateKey.algorithm Algorithm of the private TLS key.
+  ## @param certificate.new.privateKey.rotationPolicy Rotation of the private TLS key.
+  ## @param certificate.new.privateKey.size Size of the private TLS key.
+  ## @param certificate.new.secretTemplate.annotations Additional annotation of the created secret.
+  ## @param certificate.new.secretTemplate.labels Additional labels of the created secret.
+  ## @param certificate.new.subject.countries List of countries.
+  ## @param certificate.new.subject.localities List of localities.
+  ## @param certificate.new.subject.organizationalUnits List of organizationalUnits.
+  ## @param certificate.new.subject.organizations List of organizations.
+  ## @param certificate.new.subject.postalCodes List of postalCodes.
+  ## @param certificate.new.subject.provinces List of provinces.
+  ## @param certificate.new.subject.serialNumber Serial number.
+  ## @param certificate.new.subject.streetAddresses List of streetAddresses.
+  ## @param certificate.new.usages Define the usage of the TLS key.
+  new:
+    annotations: {}
+    labels: {}
+    duration: "744h"      # 31 days
+    renewBefore: "672h"   # 28 days
+    dnsNames: []
+    # The following DNS names are already part of the SAN's and serves only as example.
+    # - "athens-proxy"
+    # - "athens-proxy.svc"
+    # - "athens-proxy.svc.namespace"
+    # - "athens-proxy.svc.namespace.cluster.local"
+    ipAddresses: []
+    # The following IP addresses serves only as example.
+    # - "10.92.1.10"
+    # - "2001:0db8:85a3:08d3:1319:8a2e:0370:7344"
+    issuerRef:
+      kind: ""
+      name: ""
+    privateKey:
+      algorithm: "RSA"
+      rotationPolicy: "Never"
+      size: 4096
+    secretTemplate:
+      annotations: {}
+      labels: {}
+    subject:
+      countries: []
+      localities: []
+      organizationalUnits: []
+      organizations: []
+      postalCodes: []
+      provinces: []
+      serialNumber: ""
+      streetAddresses: []
+    usages:
+    - "client auth"
+    - "server auth"
+
 ## @section Configuration
 config:
   env:
@@ -78,8 +149,6 @@ config:
         # ATHENS_STORAGE_GCP_JSON_KEY:
         # ATHENS_SUM_DBS:
         # ATHENS_TIMEOUT:
-        # ATHENS_TLSCERT_FILE:
-        # ATHENS_TLSKEY_FILE:
         # ATHENS_TRACE_EXPORTER_URL:
         # ATHENS_TRACE_EXPORTER:
         # AWS_ACCESS_KEY_ID:
@@ -490,15 +559,19 @@ persistence:
     ## @param persistence.data.persistentVolumeClaim.annotations Additional persistent volume claim annotations.
     ## @param persistence.data.persistentVolumeClaim.labels Additional persistent volume claim labels.
     ## @param persistence.data.persistentVolumeClaim.accessModes Access modes of the persistent volume claim.
-    ## @param persistence.data.persistentVolumeClaim.storageClass Storage class of the persistent volume claim.
+    ## @param persistence.data.persistentVolumeClaim.storageClassName Storage class of the persistent volume claim.
     ## @param persistence.data.persistentVolumeClaim.storageSize Size of the persistent volume claim.
     persistentVolumeClaim:
       annotations: {}
       labels: {}
       accessModes:
       - ReadWriteMany
-      storageClass: ""
+      storageClassName: ""
       storageSize: "5Gi"
+
+## @section Network
+## @param clusterDomain Domain of the Cluster. Domain is part of internally issued certificates.
+clusterDomain: "cluster.local"
 
 ## @section Network Policy
 networkPolicy:
