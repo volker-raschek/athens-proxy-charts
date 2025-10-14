@@ -48,6 +48,15 @@ spec:
   secretTemplate:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- if or .Values.certificate.new.subject.countries
+            .Values.certificate.new.subject.localities
+            .Values.certificate.new.subject.organizationalUnits
+            .Values.certificate.new.subject.organizations
+            .Values.certificate.new.subject.postalCodes
+            .Values.certificate.new.subject.provinces
+            .Values.certificate.new.subject.serialNumber
+            .Values.certificate.new.subject.streetAddresses
+  }}
   subject:
     {{- with .Values.certificate.new.subject.countries }}
     countries:
@@ -80,6 +89,7 @@ spec:
     streetAddresses:
     {{- toYaml . | nindent 4 }}
     {{- end }}
+  {{- end }}
   usages:
   {{- range .Values.certificate.new.usages }}
   - {{ . }}

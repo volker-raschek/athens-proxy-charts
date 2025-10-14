@@ -99,7 +99,7 @@ tests:
       path: spec.secretTemplate.annotations
   - exists:
       path: spec.secretTemplate.labels
-  - exists:
+  - notExists:
       path: spec.subject
   - notExists:
       path: spec.subject.countries
