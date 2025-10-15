@@ -107,7 +107,7 @@ The secret must be from type `kubernetes.io/tls`.
 CHART_VERSION=0.5.5
 helm install --version "${CHART_VERSION}" athens-proxy volker.raschek/athens-proxy \
   --set 'config.certificate.enabled=true' \
-  --set 'config.certificate.new.issuerRef.kind=Issuer'
+  --set 'config.certificate.new.issuerRef.kind=Issuer' \
   --set 'config.certificate.new.issuerRef.name=athens-proxy-ca'
 ```
 
