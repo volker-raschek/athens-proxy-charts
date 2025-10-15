@@ -91,6 +91,57 @@ helm install --version "${CHART_VERSION}" athens-proxy volker.raschek/athens-pro
   --set 'deployment.athensProxy.resources.limits.cpu=1000m'
 ```
 
+#### TLS encryption
+
+The example shows how to deploy the application with TLS encryption. For example when **no** HTTP ingress is used for
+TLS determination and instead the application it self should determinate the TLS handshake. To generate the TLS
+certificate can be used the [cert-manager](https://cert-manager.io/). The chart supports the creation of such a TLS
+certificate via `cert-manager.io/v1 Certificate` resource. Alternatively can be mounted a TLS certificate from a secret.
+The secret must be from type `kubernetes.io/tls`.
+
+> [!WARNING]
+> The following example expects that the [cert-manager](https://cert-manager.io/) is deployed and the `Issuer` named
+> `athens-proxy-ca` is present in the same namespace of the helm deployment.
+
+```bash
+CHART_VERSION=0.5.5
+helm install --version "${CHART_VERSION}" athens-proxy volker.raschek/athens-proxy \
+  --set 'config.certificate.enabled=true' \
+  --set 'config.certificate.new.issuerRef.kind=Issuer'
+  --set 'config.certificate.new.issuerRef.name=athens-proxy-ca'
+```
+
+The environment variables `ATHENS_TLSCERT_FILE` and `ATHENS_TLSKEY_FILE` are automatically added and the TLS certificate
+and private key are mounted to a pre-defined destination inside the container file system.
+
+#### TLS certificate rotation
+
+If the application uses TLS certificates that are mounted as a secret in the container file system like the example
+[above](#tls-encryption), the application will not automatically apply them when the TLS certificates are rotated. Such
+a rotation can be for example triggered, when the [cert-manager](https://cert-manager.io/) issues new TLS certificates
+before expiring.
+
+Until the exporter does not support rotating TLS certificate a workaround can be applied. For example stakater's
+[reloader](https://github.com/stakater/Reloader) controller can be used to trigger a rolling update. The following
+annotation must be added to instruct the reloader controller to trigger a rolling update, when the mounted configMaps
+and secrets have been changed.
+
+```yaml
+deployment:
+  annotations:
+    reloader.stakater.com/auto: "true"
+```
+
+Instead of triggering a rolling update for configMap and secret resources, this action can also be defined for
+individual items. For example, when the secret named `athens-proxy-tls` is mounted and the reloader controller should
+only listen for changes of this secret:
+
+```yaml
+deployment:
+  annotations:
+    secret.reloader.stakater.com/reload: "athens-proxy-tls"
+```
+
 #### Network policies
 
 Network policies can only take effect, when the used CNI plugin support network policies. The chart supports no custom
