@@ -550,8 +550,8 @@ persistence:
     ## @param persistence.data.mountPath The path where the persistent volume should be mounted in the container file system. This variable controls `ATHENS_DISK_STORAGE_ROOT`.
     mountPath: "/var/www/athens-proxy/data"
 
-    ## @param persistence.data.existingPersistentVolumeClaim.enabled TODO
-    ## @param persistence.data.existingPersistentVolumeClaim.persistentVolumeClaimName TODO
+    ## @param persistence.data.existingPersistentVolumeClaim.enabled Use an existing persistent volume claim.
+    ## @param persistence.data.existingPersistentVolumeClaim.persistentVolumeClaimName The name of the existing persistent volume claim.
     existingPersistentVolumeClaim:
       enabled: false
       persistentVolumeClaimName: ""
