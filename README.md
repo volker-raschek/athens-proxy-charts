@@ -200,7 +200,8 @@ networkPolicies:
 
 The behavior whereby ArgoCD triggers a rolling update even though nothing appears to have changed often occurs in
 connection with the helm concept `checksum/secret`, `checksum/configmap` or more generally, [Automatically Roll
-Deployments](https://helm.sh/docs/howto/charts_tips_and_tricks/#automatically-roll-deployments).
+Deployments](https://helm.sh/docs/howto/charts_tips_and_tricks/#automatically-roll-deployments). Please ensure, that no
+third party application modifies the config maps or secret afterwards.
 
 The problem with combining this concept with ArgoCD is that ArgoCD re-renders the Helm chart every time. Even if the
 content of the config map or secret has not changed, there may be minimal differences (e.g., whitespace, chart version,
@@ -209,18 +210,48 @@ Helm render order, different timestamps).
 This changes the SHA256 hash, Argo sees a drift and trigger a rolling update of the deployment. Among other things, this
 can lead to unnecessary notifications from ArgoCD.
 
-To avoid this, the annotation with the shasum must be ignored. Below is a diff that adds the `Application` to ignore all
-annotations with the prefix `checksum`.
+To avoid this, the annotation with the shasum can be ignored. However, this negates the mechanism of [Automatically Roll
+Deployments](https://helm.sh/docs/howto/charts_tips_and_tricks/#automatically-roll-deployments).
+
+Below is a diff that adds the `Application` to ignore all annotations with the prefix `checksum`.
+
+> [!WARNING]
+> Configurations of `ignoreDifferences` always refer to the determination of a drift and whether a possible sync is
+> necessary. If the selected attributes should also be ignored in deployment afterwards, define
+> `RespectIgnoreDifferences=true` in your `Application` resource. Further information can be found in the ArgoCD
+> [documentation](https://argo-cd.readthedocs.io/en/latest/user-guide/sync-options/#respect-ignore-differences-configs).
 
 ```diff
   apiVersion: argoproj.io/v1alpha1
   kind: Application
   spec:
 +   ignoreDifferences:
-+   - group: apps/v1
++   - group: apps
 +     kind: Deployment
 +     jqPathExpressions:
 +     - '.spec.template.metadata.annotations | with_entries(select(.key | startswith("checksum")))'
+```
+
+The definition of ignoreDifferences ensures that annotations with the prefix checksum are ignored during a diff.
+
+> [!TIP]
+> If the [reloader](https://github.com/stakater/Reloader) is configured as described in section [TLS certificate
+> rotation](#tls-certificate-rotation), ensure that the shasum defined as annotation or environment variable is also
+> ignored. The [reloader](https://github.com/stakater/Reloader) will modify the deployment based on his configuration
+> and append additional annotations or environment variables containing the shasum. Below are some examples how to adapt
+> the `ignoreDifferences` configuration to ignore only the annotations and environment variables of stakater's
+> [reloader](https://github.com/stakater/Reloader).
+
+```diff
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  spec:
+    ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jqPathExpressions:
++     - '.spec.template.metadata.annotations | with_entries(select(.key | startswith("stakater")))'
++     - '.spec.template.spec.containers[].env[] | select(.name | startswith("STAKATER_"))'
 ```
 
 ## Parameters
