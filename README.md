@@ -250,7 +250,7 @@ The definition of ignoreDifferences ensures that annotations with the prefix che
     - group: apps
       kind: Deployment
       jqPathExpressions:
-+     - '.spec.template.metadata.annotations | with_entries(select(.key | startswith("stakater")))'
++     - '.spec.template.metadata.annotations | with_entries(select(.key | startswith("reloader")))'
 +     - '.spec.template.spec.containers[].env[] | select(.name | startswith("STAKATER_"))'
 ```
 
