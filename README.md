@@ -189,6 +189,9 @@ networkPolicies:
     - port: 53
       protocol: UDP
   - ports:
+    - port: 22
+      protocol: TCP
+  - ports:
     - port: 443
       protocol: TCP
 

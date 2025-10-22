@@ -590,6 +590,12 @@ networkPolicy:
   # - Egress
   # - Ingress
   egress: []
+  # Allow outgoing SSH traffic to Source Code Control System's (SCCS') like GitHub or GitLab.
+  #
+  # - ports:
+  #   - port: 22
+  #     protocol: TCP
+
   # Allow outgoing HTTPS traffic to external go module servers
   #
   # - ports:
