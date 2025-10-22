@@ -16,10 +16,7 @@ Chapter [configuration and installation](#helm-configuration-and-installation) d
 helm and use it to deploy the exporter. It also contains further configuration examples.
 
 Furthermore, this helm chart contains unit tests to detect regressions and stabilize the deployment. Additionally, this
-helm chart is tested for deployment scenarios with **ArgoCD**, but please keep in mind, that this chart supports the
-*[Automatically Roll Deployment](https://helm.sh/docs/howto/charts_tips_and_tricks/#automatically-roll-deployments)*
-concept of Helm, which can trigger unexpected rolling releases. Further configuration instructions are described in a
-separate [chapter](#argocd).
+helm chart is tested for deployment scenarios with **ArgoCD**.
 
 ## Helm: configuration and installation
 
@@ -47,7 +44,7 @@ helm show values volker.raschek/athens-proxy --version "${CHART_VERSION}" > valu
 A complete list of available helm chart versions can be displayed via the following command:
 
 ```bash
-helm search repo reposilite --versions
+helm search repo athens-proxy --versions
 ```
 
 The helm chart also contains a persistent volume claim definition. It persistent volume claim is not enabled by default.
@@ -142,6 +139,20 @@ deployment:
     secret.reloader.stakater.com/reload: "athens-proxy-tls"
 ```
 
+If the application is rolled out using ArgoCD, a rolling update from stakater's
+[reloader](https://github.com/stakater/Reloader) can lead to a drift. ArgoCD will attempt to restore the original state
+with a rolling update. To avoid this, instead of a rolling update triggered by the reloader, a restart of the pod can be
+initiated. Further information are available in the official
+[README](https://github.com/stakater/Reloader?tab=readme-ov-file#4-%EF%B8%8F-workload-specific-rollout-strategy) of
+stakater's reloader.
+
+```diff
+  deployment:
+    annotations:
+      reloader.stakater.com/auto: "true"
++     reloader.stakater.com/rollout-strategy: "restart"
+```
+
 #### Network policies
 
 Network policies can only take effect, when the used CNI plugin support network policies. The chart supports no custom
@@ -196,62 +207,51 @@ networkPolicies:
 
 ## ArgoCD
 
-### Daily execution of rolling updates
+### Example Application
 
-The behavior whereby ArgoCD triggers a rolling update even though nothing appears to have changed often occurs in
-connection with the helm concept `checksum/secret`, `checksum/configmap` or more generally, [Automatically Roll
-Deployments](https://helm.sh/docs/howto/charts_tips_and_tricks/#automatically-roll-deployments). Please ensure, that no
-third party application modifies the config maps or secret afterwards.
+An application resource for the Helm chart is defined below. It serves as an example for your own deployment.
 
-The problem with combining this concept with ArgoCD is that ArgoCD re-renders the Helm chart every time. Even if the
-content of the config map or secret has not changed, there may be minimal differences (e.g., whitespace, chart version,
-Helm render order, different timestamps).
-
-This changes the SHA256 hash, Argo sees a drift and trigger a rolling update of the deployment. Among other things, this
-can lead to unnecessary notifications from ArgoCD.
-
-To avoid this, the annotation with the shasum can be ignored. However, this negates the mechanism of [Automatically Roll
-Deployments](https://helm.sh/docs/howto/charts_tips_and_tricks/#automatically-roll-deployments).
-
-Below is a diff that adds the `Application` to ignore all annotations with the prefix `checksum`.
-
-> [!WARNING]
-> Configurations of `ignoreDifferences` always refer to the determination of a drift and whether a possible sync is
-> necessary. If the selected attributes should also be ignored in deployment afterwards, define
-> `RespectIgnoreDifferences=true` in your `Application` resource. Further information can be found in the ArgoCD
-> [documentation](https://argo-cd.readthedocs.io/en/latest/user-guide/sync-options/#respect-ignore-differences-configs).
-
-```diff
-  apiVersion: argoproj.io/v1alpha1
-  kind: Application
-  spec:
-+   ignoreDifferences:
-+   - group: apps
-+     kind: Deployment
-+     jqPathExpressions:
-+     - '.spec.template.metadata.annotations | with_entries(select(.key | startswith("checksum")))'
-```
-
-The definition of ignoreDifferences ensures that annotations with the prefix checksum are ignored during a diff.
-
-> [!TIP]
-> If the [reloader](https://github.com/stakater/Reloader) is configured as described in section [TLS certificate
-> rotation](#tls-certificate-rotation), ensure that the shasum defined as annotation or environment variable is also
-> ignored. The [reloader](https://github.com/stakater/Reloader) will modify the deployment based on his configuration
-> and append additional annotations or environment variables containing the shasum. Below are some examples how to adapt
-> the `ignoreDifferences` configuration to ignore only the annotations and environment variables of stakater's
-> [reloader](https://github.com/stakater/Reloader).
-
-```diff
-  apiVersion: argoproj.io/v1alpha1
-  kind: Application
-  spec:
-    ignoreDifferences:
-    - group: apps
-      kind: Deployment
-      jqPathExpressions:
-+     - '.spec.template.metadata.annotations | with_entries(select(.key | startswith("reloader")))'
-+     - '.spec.template.spec.containers[].env[] | select(.name | startswith("STAKATER_"))'
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: athens-proxy
+  ignoreDifferences:
+  - group: apps
+    kind: Deployment
+    jqPathExpressions:
+    # When HPA is enabled, ensure that a modification of the replicas does not lead to a
+    # drift.
+      - '.spec.replicas'
+    # Ensure that changes of the annotations or environment variables added or modified by
+    # stakater's reloader does not lead to a drift.
+    - '.spec.template.metadata.annotations | with_entries(select(.key | startswith("reloader")))'
+    - '.spec.template.spec.containers[].env[] | select(.name | startswith("STAKATER_"))'
+  sources:
+  - repoURL: https://charts.cryptic.systems/volker.raschek
+    chart: athens-proxy
+    targetRevision: '0.*'
+    helm:
+      valueFiles:
+      - $values/values.yaml
+      releaseName: athens-proxy
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    managedNamespaceMetadata:
+      annotations: {}
+      labels: {}
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - CreateNamespace=true
+    - FailOnSharedResource=false
+    - Replace=false
+    - RespectIgnoreDifferences=false
+    - ServerSideApply=true
+    - Validate=true
 ```
 
 ## Parameters
