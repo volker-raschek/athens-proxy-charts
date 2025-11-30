@@ -6,7 +6,8 @@
 {{- include "athens-proxy.annotations" . }}
 {{- if and .Values.certificate.enabled (not .Values.certificate.existingSecret.enabled) }}
 {{- $secretName := include "athens-proxy.certificates.server.name" $ }}
-{{ printf "checksum/secret-%s: %s" $secretName (print (lookup "v1" "Secret" .Release.Namespace $secretName) | sha256sum) }}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace $secretName }}
+{{ printf "checksum/secret-%s: %s" $secretName ($secret | toYaml | sha256sum) }}
 {{- end }}
 {{- if and .Values.config.env.enabled (not .Values.config.env.existingSecret.enabled) }}
 {{ printf "checksum/secret-%s: %s" (include "athens-proxy.secrets.env.name" $) (include (print $.Template.BasePath "/secretEnv.yaml") . | sha256sum) }}
