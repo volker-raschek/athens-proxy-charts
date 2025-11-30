@@ -107,6 +107,7 @@ tests:
 - it: Rendering default with mounted ssh keys
   set:
     config.ssh.enabled: true
+    config.ssh.addSHASumAnnotation: true
     config.ssh.secret.id_ed25519: foo
     config.ssh.secret.id_ed25519_pub: bar
     config.ssh.secret.id_rsa: foo
@@ -180,6 +181,7 @@ tests:
 - it: Rendering with custom ssh secret
   set:
     config.ssh.enabled: true
+    config.ssh.addSHASumAnnotation: true
     config.ssh.existingSecret.enabled: true
     config.ssh.existingSecret.secretName: "my-custom-secret"
     config.ssh.existingSecret.configKey : "my-config-key"
@@ -189,8 +191,8 @@ tests:
     config.ssh.existingSecret.id_rsaPubKey : "my-public-rsa-key"
     persistence.enabled: true
   asserts:
-    - notExists:
-        path: spec.template.metadata.annotations.checksum/secret-athens-proxy-unittest-ssh
+    - exists:
+        path: spec.template.metadata.annotations.checksum/secret-my-custom-secret
       template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
@@ -251,4 +253,15 @@ tests:
                   path: id_rsa.pub
                   mode: 0644
                 name: my-custom-secret
+      template: templates/deployment.yaml
+
+- it: Rendering with custom ssh secret, but without sha sum annotation
+  set:
+    config.ssh.enabled: true
+    config.ssh.addSHASumAnnotation: false
+    config.ssh.existingSecret.enabled: true
+    config.ssh.existingSecret.secretName: "my-custom-secret"
+  asserts:
+    - notExists:
+        path: spec.template.metadata.annotations.checksum/secret-my-custom-secret
       template: templates/deployment.yaml

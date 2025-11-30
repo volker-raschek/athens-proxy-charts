@@ -40,6 +40,7 @@ tests:
 - it: Rendering default with mounted netrc secret
   set:
     config.netrc.enabled: true
+    config.netrc.addSHASumAnnotation: true
     persistence.enabled: true
   asserts:
     - exists:
@@ -66,16 +67,80 @@ tests:
                 name: athens-proxy-unittest-netrc
       template: templates/deployment.yaml
 
+- it: Rendering default with mounted netrc secret, but without sha sum annotation
+  set:
+    config.netrc.enabled: true
+    config.netrc.addSHASumAnnotation: false
+    persistence.enabled: true
+  asserts:
+    - notExists:
+        path: spec.template.metadata.annotations.checksum/secret-athens-proxy-unittest-netrc
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: secrets
+          mountPath: /root/.netrc
+          subPath: .netrc
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: secrets
+          projected:
+            sources:
+            - secret:
+                items:
+                - key: .netrc
+                  path: .netrc
+                  mode: 0600
+                name: athens-proxy-unittest-netrc
+      template: templates/deployment.yaml
+
 - it: Rendering with custom netrc secret
   set:
     config.netrc.enabled: true
+    config.netrc.addSHASumAnnotation: true
+    config.netrc.existingSecret.enabled: true
+    config.netrc.existingSecret.secretName: "my-custom-secret"
+    config.netrc.existingSecret.netrcKey: "my-netrc-key"
+    persistence.enabled: true
+  asserts:
+    - exists:
+        path: spec.template.metadata.annotations.checksum/secret-my-custom-secret
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: secrets
+          mountPath: /root/.netrc
+          subPath: .netrc
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: secrets
+          projected:
+            sources:
+            - secret:
+                items:
+                - key: my-netrc-key
+                  path: .netrc
+                  mode: 0600
+                name: my-custom-secret
+      template: templates/deployment.yaml
+
+- it: Rendering with custom netrc secret, but without sha sum annotation
+  set:
+    config.netrc.enabled: true
+    config.netrc.addSHASumAnnotation: false
     config.netrc.existingSecret.enabled: true
     config.netrc.existingSecret.secretName: "my-custom-secret"
     config.netrc.existingSecret.netrcKey: "my-netrc-key"
     persistence.enabled: true
   asserts:
     - notExists:
-        path: spec.template.metadata.annotations.checksum/secret-athens-proxy-unittest-netc
+        path: spec.template.metadata.annotations.checksum/secret-my-custom-secret
       template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts

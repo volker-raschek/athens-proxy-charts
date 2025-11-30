@@ -41,6 +41,7 @@ tests:
 - it: Rendering default with mounted gitconfig configMap
   set:
     config.gitConfig.enabled: true
+    config.gitConfig.addSHASumAnnotation: true
     persistence.enabled: true
   asserts:
     - exists:
@@ -67,16 +68,80 @@ tests:
                 name: athens-proxy-unittest-gitconfig
       template: templates/deployment.yaml
 
+- it: Rendering default with mounted gitconfig configMap, but without sha sum annotation
+  set:
+    config.gitConfig.enabled: true
+    config.gitConfig.addSHASumAnnotation: false
+    persistence.enabled: true
+  asserts:
+    - notExists:
+        path: spec.template.metadata.annotations.checksum/config-map-athens-proxy-unittest-gitconfig
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: secrets
+          mountPath: /root/.gitconfig
+          subPath: .gitconfig
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: secrets
+          projected:
+            sources:
+            - configMap:
+                items:
+                - key: .gitconfig
+                  path: .gitconfig
+                  mode: 0644
+                name: athens-proxy-unittest-gitconfig
+      template: templates/deployment.yaml
+
 - it: Rendering with custom gitconfig configMap
   set:
     config.gitConfig.enabled: true
+    config.gitConfig.addSHASumAnnotation: true
+    config.gitConfig.existingConfigMap.enabled: true
+    config.gitConfig.existingConfigMap.configMapName: "my-custom-configmap"
+    config.gitConfig.existingConfigMap.gitConfigKey: "my-gitconfig-key"
+    persistence.enabled: true
+  asserts:
+    - exists:
+        path: spec.template.metadata.annotations.checksum/config-map-my-custom-configmap
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: secrets
+          mountPath: /root/.gitconfig
+          subPath: .gitconfig
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: secrets
+          projected:
+            sources:
+            - configMap:
+                items:
+                - key: my-gitconfig-key
+                  path: .gitconfig
+                  mode: 0644
+                name: my-custom-configmap
+      template: templates/deployment.yaml
+
+- it: Rendering with custom gitconfig configMap, but without sha sum annotations
+  set:
+    config.gitConfig.enabled: true
+    config.gitConfig.addSHASumAnnotation: false
     config.gitConfig.existingConfigMap.enabled: true
     config.gitConfig.existingConfigMap.configMapName: "my-custom-configmap"
     config.gitConfig.existingConfigMap.gitConfigKey: "my-gitconfig-key"
     persistence.enabled: true
   asserts:
     - notExists:
-        path: spec.template.metadata.annotations.checksum/config-map-athens-proxy-unittest-gitconfig
+        path: spec.template.metadata.annotations.checksum/config-map-my-custom-configmap
       template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].volumeMounts

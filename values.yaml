@@ -8,7 +8,9 @@ fullnameOverride: ""
 ## @section Certificate
 certificate:
   ## @param certificate.enabled Issue a TLS certificate via cert-manager. If enabled, the environment variables `ATHENS_TLSCERT_FILE` and `ATHENS_TLSKEY_FILE` will be automatically added.
+  ## @param certificate.addSHASumAnnotation Add an pod annotation with the sha sum of the secret containing the TLS certificates.
   enabled: false
+  addSHASumAnnotation: true
 
   ## @param certificate.existingSecret.enabled Use an existing secret of the type `kubernetes.io/tls`.
   ## @param certificate.existingSecret.secretName Name of the secret containing the TLS certificate and private key.
@@ -80,7 +82,9 @@ certificate:
 config:
   env:
     ## @param config.env.enabled Enable mounting of the secret as environment variables.
+    ## @param config.env.addSHASumAnnotation Add an pod annotation with the sha sum of the config map containing the configuration.
     enabled: false
+    addSHASumAnnotation: true
 
     ## @param config.env.existingSecret.enabled Mount an existing secret containing the application specific environment variables.
     ## @param config.env.existingSecret.secretName Name of the existing secret containing the application specific environment variables.
@@ -168,7 +172,9 @@ config:
 
   downloadMode:
     ## @param config.downloadMode.enabled Enable mounting of a download mode file into the container file system. If enabled, the env `ATHENS_DOWNLOAD_MODE` will automatically be defined.
+    ## @param config.downloadMode.addSHASumAnnotation Add an pod annotation with the sha sum of the config map containing the downloadMode config.
     enabled: false
+    addSHASumAnnotation: true
 
     ## @param config.downloadMode.existingConfigMap.enabled Enable to use an external config map for mounting the download mode file.
     ## @param config.downloadMode.existingConfigMap.configMapName The name of the existing config map which should be used to mount the download mode file.
@@ -204,7 +210,9 @@ config:
 
   gitConfig:
     ## @param config.gitConfig.enabled Enable mounting of a .gitconfig file into the container file system.
+    ## @param config.gitConfig.addSHASumAnnotation Add an pod annotation with the sha sum of the config map containing the git config.
     enabled: false
+    addSHASumAnnotation: true
 
     ## @param config.gitConfig.existingConfigMap.enabled Enable to use an external config map for mounting the .gitconfig file.
     ## @param config.gitConfig.existingConfigMap.configMapName The name of the existing config map which should be used to mount the .gitconfig file.
@@ -230,7 +238,9 @@ config:
 
   netrc:
     ## @param config.netrc.enabled Enable mounting of a .netrc file into the container file system.
+    ## @param config.netrc.addSHASumAnnotation Add an pod annotation with the sha sum of the secret containing the netrc file.
     enabled: false
+    addSHASumAnnotation: true
 
     ## @param config.netrc.existingSecret.enabled Enable to use an external secret for mounting the .netrc file.
     ## @param config.netrc.existingSecret.secretName The name of the existing secret which should be used to mount the .netrc file.
@@ -262,7 +272,9 @@ config:
 
   ssh:
     ## @param config.ssh.enabled Enable mounting of a .netrc file into the container file system.
+    ## @param config.ssh.addSHASumAnnotation Add an pod annotation with the sha sum of the secret containing the ssh keys.
     enabled: false
+    addSHASumAnnotation: true
 
     ## @param config.ssh.existingSecret.enabled Enable to use an external secret for mounting the public and private SSH key files.
     ## @param config.ssh.existingSecret.secretName The name of the existing secret which should be used to mount the public and private SSH key files.
