@@ -74,3 +74,38 @@ tests:
           secret:
             secretName: athens-proxy-unittest-tls
       template: templates/deployment.yaml
+
+- it: Rendering with external TLS config
+  set:
+    certificate.enabled: true
+    certificate.existingSecret.enabled: true
+    certificate.existingSecret.secretName: my-own-secret
+  asserts:
+    - exists:
+        path: spec.template.metadata.annotations["checksum/secret-my-own-secret"]
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_TLSCERT_FILE
+          value: /etc/athens-proxy/tls/tls.crt
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: ATHENS_TLSKEY_FILE
+          value: /etc/athens-proxy/tls/tls.key
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: tls
+          mountPath: /etc/athens-proxy/tls
+      template: templates/deployment.yaml
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: tls
+          secret:
+            secretName: athens-proxy-unittest-tls
+      template: templates/deployment.yaml

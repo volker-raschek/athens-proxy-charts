@@ -4,8 +4,11 @@
 
 {{- define "athens-proxy.pod.annotations" }}
 {{- include "athens-proxy.annotations" . }}
-{{- if and .Values.certificate.enabled (not .Values.certificate.existingSecret.enabled) }}
+{{- if and .Values.certificate.enabled }}
 {{- $secretName := include "athens-proxy.certificates.server.name" $ }}
+{{- if and .Values.certificate.existingSecret.enabled (gt (len .Values.certificate.existingSecret.secretName) 0) }}
+{{- $secretName = .Values.certificate.existingSecret.secretName }}
+{{- end }}
 {{- $secret := lookup "v1" "Secret" .Release.Namespace $secretName }}
 {{ printf "checksum/secret-%s: %s" $secretName ($secret | toYaml | sha256sum) }}
 {{- end }}
