@@ -37,7 +37,7 @@ version of the chart must be in sync with the `values.yaml`. Newer *minor* versi
 versions can break something!
 
 ```bash
-CHART_VERSION=1.1.1
+CHART_VERSION=1.2.1
 helm show values volker.raschek/athens-proxy --version "${CHART_VERSION}" > values.yaml
 ```
 
@@ -51,7 +51,7 @@ The helm chart also contains a persistent volume claim definition. It persistent
 Use the `--set` argument to persist your data.
 
 ```bash
-CHART_VERSION=1.1.1
+CHART_VERSION=1.2.1
 helm install --version "${CHART_VERSION}" athens-proxy volker.raschek/athens-proxy \
   persistence.enabled=true
 ```
@@ -81,7 +81,7 @@ Further information about this topic can be found in one of Kanishk's blog
 > Please take care the a CPU limit < `1000m` can also lead to CPU throttling. Please read the linked documentation carefully.
 
 ```bash
-CHART_VERSION=1.1.1
+CHART_VERSION=1.2.1
 helm install --version "${CHART_VERSION}" athens-proxy volker.raschek/athens-proxy \
   --set 'deployment.athensProxy.env.name=GOMAXPROCS' \
   --set 'deployment.athensProxy.env.valueFrom.resourceFieldRef.resource=limits.cpu' \
@@ -101,7 +101,7 @@ The secret must be from type `kubernetes.io/tls`.
 > `athens-proxy-ca` is present in the same namespace of the helm deployment.
 
 ```bash
-CHART_VERSION=1.1.1
+CHART_VERSION=1.2.1
 helm install --version "${CHART_VERSION}" athens-proxy volker.raschek/athens-proxy \
   --set 'config.certificate.enabled=true' \
   --set 'config.certificate.new.issuerRef.kind=Issuer' \
