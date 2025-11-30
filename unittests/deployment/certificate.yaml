@@ -46,6 +46,9 @@ tests:
     certificate.new.issuerRef.kind: ClusterIssuer
     certificate.new.issuerRef.name: MyIssuer
   asserts:
+    - exists:
+        path: spec.template.metadata.annotations["checksum/secret-athens-proxy-unittest-tls"]
+      template: templates/deployment.yaml
     - contains:
         path: spec.template.spec.containers[0].env
         content:
