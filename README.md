@@ -338,42 +338,52 @@ spec:
 
 ### Deployment
 
-| Name                                               | Description                                                                                                | Value           |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------- |
-| `deployment.annotations`                           | Additional deployment annotations.                                                                         | `{}`            |
-| `deployment.labels`                                | Additional deployment labels.                                                                              | `{}`            |
-| `deployment.additionalContainers`                  | List of additional containers.                                                                             | `[]`            |
-| `deployment.affinity`                              | Affinity for the athens-proxy deployment.                                                                  | `{}`            |
-| `deployment.initContainers`                        | List of additional init containers.                                                                        | `[]`            |
-| `deployment.dnsConfig`                             | dnsConfig of the athens-proxy deployment.                                                                  | `{}`            |
-| `deployment.dnsPolicy`                             | dnsPolicy of the athens-proxy deployment.                                                                  | `""`            |
-| `deployment.hostname`                              | Individual hostname of the pod.                                                                            | `""`            |
-| `deployment.subdomain`                             | Individual domain of the pod.                                                                              | `""`            |
-| `deployment.hostNetwork`                           | Use the kernel network namespace of the host system.                                                       | `false`         |
-| `deployment.imagePullSecrets`                      | Secret to use for pulling the image.                                                                       | `[]`            |
-| `deployment.athensProxy.args`                      | Arguments passed to the athens-proxy container.                                                            | `[]`            |
-| `deployment.athensProxy.command`                   | Command passed to the athens-proxy container.                                                              | `[]`            |
-| `deployment.athensProxy.env`                       | List of environment variables for the athens-proxy container.                                              | `[]`            |
-| `deployment.athensProxy.envFrom`                   | List of environment variables mounted from configMaps or secrets for the athens-proxy container.           | `[]`            |
-| `deployment.athensProxy.image.registry`            | Image registry, eg. `docker.io`.                                                                           | `docker.io`     |
-| `deployment.athensProxy.image.repository`          | Image repository, eg. `library/busybox`.                                                                   | `gomods/athens` |
-| `deployment.athensProxy.image.tag`                 | Custom image tag, eg. `0.1.0`. Defaults to `appVersion`.                                                   | `""`            |
-| `deployment.athensProxy.image.pullPolicy`          | Image pull policy.                                                                                         | `IfNotPresent`  |
-| `deployment.athensProxy.resources`                 | CPU and memory resources of the pod.                                                                       | `{}`            |
-| `deployment.athensProxy.securityContext`           | Security context of the container of the deployment.                                                       | `{}`            |
-| `deployment.athensProxy.volumeMounts`              | Additional volume mounts.                                                                                  | `[]`            |
-| `deployment.nodeSelector`                          | NodeSelector of the athens-proxy deployment.                                                               | `{}`            |
-| `deployment.priorityClassName`                     | PriorityClassName of the athens-proxy deployment.                                                          | `""`            |
-| `deployment.replicas`                              | Number of replicas for the athens-proxy deployment.                                                        | `1`             |
-| `deployment.restartPolicy`                         | Restart policy of the athens-proxy deployment.                                                             | `""`            |
-| `deployment.securityContext`                       | Security context of the athens-proxy deployment.                                                           | `{}`            |
-| `deployment.strategy.type`                         | Strategy type - `Recreate` or `RollingUpdate`.                                                             | `RollingUpdate` |
-| `deployment.strategy.rollingUpdate.maxSurge`       | The maximum number of pods that can be scheduled above the desired number of pods during a rolling update. | `1`             |
-| `deployment.strategy.rollingUpdate.maxUnavailable` | The maximum number of pods that can be unavailable during a rolling update.                                | `1`             |
-| `deployment.terminationGracePeriodSeconds`         | How long to wait until forcefully kill the pod.                                                            | `60`            |
-| `deployment.tolerations`                           | Tolerations of the athens-proxy deployment.                                                                | `[]`            |
-| `deployment.topologySpreadConstraints`             | TopologySpreadConstraints of the athens-proxy deployment.                                                  | `[]`            |
-| `deployment.volumes`                               | Additional volumes to mount into the pods of the athens-proxy deployment.                                  | `[]`            |
+| Name                                                        | Description                                                                                                | Value           |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------- |
+| `deployment.annotations`                                    | Additional deployment annotations.                                                                         | `{}`            |
+| `deployment.labels`                                         | Additional deployment labels.                                                                              | `{}`            |
+| `deployment.additionalContainers`                           | List of additional containers.                                                                             | `[]`            |
+| `deployment.affinity`                                       | Affinity for the athens-proxy deployment.                                                                  | `{}`            |
+| `deployment.initContainers`                                 | List of additional init containers.                                                                        | `[]`            |
+| `deployment.dnsConfig`                                      | dnsConfig of the athens-proxy deployment.                                                                  | `{}`            |
+| `deployment.dnsPolicy`                                      | dnsPolicy of the athens-proxy deployment.                                                                  | `""`            |
+| `deployment.hostname`                                       | Individual hostname of the pod.                                                                            | `""`            |
+| `deployment.subdomain`                                      | Individual domain of the pod.                                                                              | `""`            |
+| `deployment.hostNetwork`                                    | Use the kernel network namespace of the host system.                                                       | `false`         |
+| `deployment.imagePullSecrets`                               | Secret to use for pulling the image.                                                                       | `[]`            |
+| `deployment.athensProxy.args`                               | Arguments passed to the athens-proxy container.                                                            | `[]`            |
+| `deployment.athensProxy.command`                            | Command passed to the athens-proxy container.                                                              | `[]`            |
+| `deployment.athensProxy.env`                                | List of environment variables for the athens-proxy container.                                              | `[]`            |
+| `deployment.athensProxy.envFrom`                            | List of environment variables mounted from configMaps or secrets for the athens-proxy container.           | `[]`            |
+| `deployment.athensProxy.image.registry`                     | Image registry, eg. `docker.io`.                                                                           | `docker.io`     |
+| `deployment.athensProxy.image.repository`                   | Image repository, eg. `library/busybox`.                                                                   | `gomods/athens` |
+| `deployment.athensProxy.image.tag`                          | Custom image tag, eg. `0.1.0`. Defaults to `appVersion`.                                                   | `""`            |
+| `deployment.athensProxy.image.pullPolicy`                   | Image pull policy.                                                                                         | `IfNotPresent`  |
+| `deployment.athensProxy.livenessProbe.failureThreshold`     | Minimum consecutive failures for the probe to be considered failed after having succeeded.                 | `3`             |
+| `deployment.athensProxy.livenessProbe.initialDelaySeconds`  | Number of seconds after the container has started before liveness probes are initiated.                    | `5`             |
+| `deployment.athensProxy.livenessProbe.periodSeconds`        | How often (in seconds) to perform the probe.                                                               | `60`            |
+| `deployment.athensProxy.livenessProbe.successThreshold`     | Minimum consecutive successes for the probe to be considered successful after having failed.               | `1`             |
+| `deployment.athensProxy.livenessProbe.timeoutSeconds`       | Number of seconds after which the probe times out.                                                         | `3`             |
+| `deployment.athensProxy.readinessProbe.failureThreshold`    | Minimum consecutive failures for the probe to be considered failed after having succeeded.                 | `3`             |
+| `deployment.athensProxy.readinessProbe.initialDelaySeconds` | Number of seconds after the container has started before liveness probes are initiated.                    | `5`             |
+| `deployment.athensProxy.readinessProbe.periodSeconds`       | How often (in seconds) to perform the probe.                                                               | `15`            |
+| `deployment.athensProxy.readinessProbe.successThreshold`    | Minimum consecutive successes for the probe to be considered successful after having failed.               | `1`             |
+| `deployment.athensProxy.readinessProbe.timeoutSeconds`      | Number of seconds after which the probe times out.                                                         | `3`             |
+| `deployment.athensProxy.resources`                          | CPU and memory resources of the pod.                                                                       | `{}`            |
+| `deployment.athensProxy.securityContext`                    | Security context of the container of the deployment.                                                       | `{}`            |
+| `deployment.athensProxy.volumeMounts`                       | Additional volume mounts.                                                                                  | `[]`            |
+| `deployment.nodeSelector`                                   | NodeSelector of the athens-proxy deployment.                                                               | `{}`            |
+| `deployment.priorityClassName`                              | PriorityClassName of the athens-proxy deployment.                                                          | `""`            |
+| `deployment.replicas`                                       | Number of replicas for the athens-proxy deployment.                                                        | `1`             |
+| `deployment.restartPolicy`                                  | Restart policy of the athens-proxy deployment.                                                             | `""`            |
+| `deployment.securityContext`                                | Security context of the athens-proxy deployment.                                                           | `{}`            |
+| `deployment.strategy.type`                                  | Strategy type - `Recreate` or `RollingUpdate`.                                                             | `RollingUpdate` |
+| `deployment.strategy.rollingUpdate.maxSurge`                | The maximum number of pods that can be scheduled above the desired number of pods during a rolling update. | `1`             |
+| `deployment.strategy.rollingUpdate.maxUnavailable`          | The maximum number of pods that can be unavailable during a rolling update.                                | `1`             |
+| `deployment.terminationGracePeriodSeconds`                  | How long to wait until forcefully kill the pod.                                                            | `60`            |
+| `deployment.tolerations`                                    | Tolerations of the athens-proxy deployment.                                                                | `[]`            |
+| `deployment.topologySpreadConstraints`                      | TopologySpreadConstraints of the athens-proxy deployment.                                                  | `[]`            |
+| `deployment.volumes`                                        | Additional volumes to mount into the pods of the athens-proxy deployment.                                  | `[]`            |
 
 ### Horizontal Pod Autoscaler (HPA)
 

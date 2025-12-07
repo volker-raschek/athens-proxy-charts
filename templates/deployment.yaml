@@ -52,27 +52,27 @@ spec:
         livenessProbe:
           exec:
             {{- if not .Values.certificate.enabled }}
-            command: [ "wget", "-T", "3", "-O", "/dev/null", "http://localhost:3000" ]
+            command: [ "wget", "-T", "{{ .Values.deployment.athensProxy.livenessProbe.timeoutSeconds }}", "-O", "/dev/null", "http://localhost:3000" ]
             {{- else }}
-            command: [ "wget", "--no-check-certificate", "-T", "3", "-O", "/dev/null", "https://localhost:3000" ]
+            command: [ "wget", "--no-check-certificate", "-T", "{{ .Values.deployment.athensProxy.livenessProbe.timeoutSeconds }}", "-O", "/dev/null", "https://localhost:3000" ]
             {{- end }}
-          failureThreshold: 3
-          initialDelaySeconds: 5
-          periodSeconds: 60
-          successThreshold: 1
-          timeoutSeconds: 3
+          failureThreshold: {{ .Values.deployment.athensProxy.livenessProbe.failureThreshold }}
+          initialDelaySeconds: {{ .Values.deployment.athensProxy.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.deployment.athensProxy.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.deployment.athensProxy.livenessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.deployment.athensProxy.livenessProbe.timeoutSeconds }}
         readinessProbe:
           exec:
             {{- if not .Values.certificate.enabled }}
-            command: [ "wget", "-T", "3", "-O", "/dev/null", "http://localhost:3000" ]
+            command: [ "wget", "-T", "{{ .Values.deployment.athensProxy.readinessProbe.timeoutSeconds }}", "-O", "/dev/null", "http://localhost:3000" ]
             {{- else }}
-            command: [ "wget", "--no-check-certificate", "-T", "3", "-O", "/dev/null", "https://localhost:3000" ]
+            command: [ "wget", "--no-check-certificate", "-T", "{{ .Values.deployment.athensProxy.readinessProbe.timeoutSeconds }}", "-O", "/dev/null", "https://localhost:3000" ]
             {{- end }}
-          failureThreshold: 3
-          initialDelaySeconds: 5
-          periodSeconds: 15
-          successThreshold: 1
-          timeoutSeconds: 3
+          failureThreshold: {{ .Values.deployment.athensProxy.readinessProbe.failureThreshold }}
+          initialDelaySeconds: {{ .Values.deployment.athensProxy.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.deployment.athensProxy.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.deployment.athensProxy.readinessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.deployment.athensProxy.readinessProbe.timeoutSeconds }}
         ports:
         - name: http
           containerPort: 3000

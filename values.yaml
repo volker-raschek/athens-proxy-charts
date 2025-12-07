@@ -415,6 +415,30 @@ deployment:
       tag: ""
       pullPolicy: IfNotPresent
 
+    ## @param deployment.athensProxy.livenessProbe.failureThreshold Minimum consecutive failures for the probe to be considered failed after having succeeded.
+    ## @param deployment.athensProxy.livenessProbe.initialDelaySeconds Number of seconds after the container has started before liveness probes are initiated.
+    ## @param deployment.athensProxy.livenessProbe.periodSeconds How often (in seconds) to perform the probe.
+    ## @param deployment.athensProxy.livenessProbe.successThreshold Minimum consecutive successes for the probe to be considered successful after having failed.
+    ## @param deployment.athensProxy.livenessProbe.timeoutSeconds Number of seconds after which the probe times out.
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 60
+      successThreshold: 1
+      timeoutSeconds: 3
+
+    ## @param deployment.athensProxy.readinessProbe.failureThreshold Minimum consecutive failures for the probe to be considered failed after having succeeded.
+    ## @param deployment.athensProxy.readinessProbe.initialDelaySeconds Number of seconds after the container has started before liveness probes are initiated.
+    ## @param deployment.athensProxy.readinessProbe.periodSeconds How often (in seconds) to perform the probe.
+    ## @param deployment.athensProxy.readinessProbe.successThreshold Minimum consecutive successes for the probe to be considered successful after having failed.
+    ## @param deployment.athensProxy.readinessProbe.timeoutSeconds Number of seconds after which the probe times out.
+    readinessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 15
+      successThreshold: 1
+      timeoutSeconds: 3
+
     ## @param deployment.athensProxy.resources CPU and memory resources of the pod.
     resources: {}
       # limits:

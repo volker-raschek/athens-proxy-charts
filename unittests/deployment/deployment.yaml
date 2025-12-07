@@ -67,6 +67,46 @@ tests:
       path: spec.template.spec.containers[0].imagePullPolicy
       value: IfNotPresent
     template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.failureThreshold
+      value: 3
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+      value: 5
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.periodSeconds
+      value: 60
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.successThreshold
+      value: 1
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.timeoutSeconds
+      value: 3
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.failureThreshold
+      value: 3
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+      value: 5
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+      value: 15
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.successThreshold
+      value: 1
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.timeoutSeconds
+      value: 3
+    template: templates/deployment.yaml
   - notExists:
       path: spec.template.spec.containers[0].resources
     template: templates/deployment.yaml
@@ -219,6 +259,77 @@ tests:
   - equal:
       path: spec.template.spec.containers[0].imagePullPolicy
       value: Always
+    template: templates/deployment.yaml
+
+- it: Test custom livenessProbe
+  set:
+    # Normal test values
+    deployment.athensProxy.livenessProbe:
+      failureThreshold: 5
+      initialDelaySeconds: 10
+      periodSeconds: 120
+      successThreshold: 3
+      timeoutSeconds: 5
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.failureThreshold
+      value: 5
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+      value: 10
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.periodSeconds
+      value: 120
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.successThreshold
+      value: 3
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.timeoutSeconds
+      value: 5
+    template: templates/deployment.yaml
+  - contains:
+      path: spec.template.spec.containers[0].livenessProbe.exec.command
+      content: "5"
+    template: templates/deployment.yaml
+
+- it: Test custom readinessProbe
+  set:
+    # Normal test values
+    deployment.athensProxy.readinessProbe:
+      failureThreshold: 10
+      initialDelaySeconds: 10
+      periodSeconds: 30
+      successThreshold: 5
+      timeoutSeconds: 5
+
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.failureThreshold
+      value: 10
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+      value: 10
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+      value: 30
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.successThreshold
+      value: 5
+    template: templates/deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.timeoutSeconds
+      value: 5
+    template: templates/deployment.yaml
+  - contains:
+      path: spec.template.spec.containers[0].readinessProbe.exec.command
+      content: "5"
     template: templates/deployment.yaml
 
 - it: Test custom resource limits and requests
