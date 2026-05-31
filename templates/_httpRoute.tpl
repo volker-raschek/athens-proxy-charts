@@ -14,7 +14,7 @@
 {{- define "athens-proxy.httpRoute.enabled" -}}
 {{- if and .Values.gatewayAPI.enabled
            .Values.gatewayAPI.core.httpRoute.enabled
-           .Values.services.http.enabled
+           .Values.service.enabled
 -}}
 true
 {{- else -}}

@@ -426,7 +426,7 @@ spec:
 | `config.downloadMode.configMap.annotations`             | Additional annotations of the config map containing the download mode file.                                                                       | `{}`             |
 | `config.downloadMode.configMap.labels`                  | Additional labels of the config map containing the download mode file.                                                                            | `{}`             |
 | `config.gitConfig.enabled`                              | Enable mounting of a .gitconfig file into the container file system.                                                                              | `false`          |
-| `config.gitConfig.addSHASumAnnotation`                  | Add an pod annotation with the sha sum of the config map containing the git config.                                                               | `true`           |
+| `config.gitConfig.addSHASumAnnotation`                  | Add an pod annotation with the sha sum of the config map containing the Git config.                                                               | `true`           |
 | `config.gitConfig.existingConfigMap.enabled`            | Enable to use an external config map for mounting the .gitconfig file.                                                                            | `false`          |
 | `config.gitConfig.existingConfigMap.configMapName`      | The name of the existing config map which should be used to mount the .gitconfig file.                                                            | `""`             |
 | `config.gitConfig.existingConfigMap.gitConfigKey`       | The name of the key inside the config map where the content of the .gitconfig file is stored.                                                     | `nil`            |
@@ -500,6 +500,30 @@ spec:
 | `deployment.topologySpreadConstraints`                      | TopologySpreadConstraints of the athens-proxy deployment.                                                  | `[]`            |
 | `deployment.volumes`                                        | Additional volumes to mount into the pods of the athens-proxy deployment.                                  | `[]`            |
 
+### GatewayAPI
+
+| Name                                                        | Description                                                                                                                                                                                         | Value   |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `gatewayAPI.enabled`                                        | Enable the Gateway API resources. Requires Kubernetes v1.19 or higher, the CRD's and a compatible gateway controller.                                                                               | `false` |
+| `gatewayAPI.core.backendTLSPolicy.enabled`                  | Enable the BackendTLSPolicy resource. Requires also `gatewayAPI.enabled` to be `true`.                                                                                                              | `false` |
+| `gatewayAPI.core.backendTLSPolicy.annotations`              | Additional annotations for the BackendTLSPolicy.                                                                                                                                                    | `{}`    |
+| `gatewayAPI.core.backendTLSPolicy.labels`                   | Additional labels for the BackendTLSPolicy.                                                                                                                                                         | `{}`    |
+| `gatewayAPI.core.backendTLSPolicy.validation`               | Validation configuration for the BackendTLSPolicy. For example, you can specify a trusted CA certificate to validate the TLS connection between the gateway and the athens-proxy pod.               | `{}`    |
+| `gatewayAPI.core.httpRoute.enabled`                         | Enable the HTTPRoute resource. Requires also `gatewayAPI.enabled` and `service.enabled` to be `true`.                                                                                               | `false` |
+| `gatewayAPI.core.httpRoute.annotations`                     | Additional annotations for the HTTPRoute.                                                                                                                                                           | `{}`    |
+| `gatewayAPI.core.httpRoute.labels`                          | Additional labels for the HTTPRoute.                                                                                                                                                                | `{}`    |
+| `gatewayAPI.core.httpRoute.hostnames`                       | Hostnames for the HTTPRoute.                                                                                                                                                                        | `[]`    |
+| `gatewayAPI.core.httpRoute.parentRefs`                      | ParentRefs for the HTTPRoute. You can specify parentRefs to bind the HTTPRoute to specific Gateway resources.                                                                                       | `[]`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.enabled`             | Enable the ClientSettingsPolicy resource. Requires also `gatewayAPI.enabled` to be `true`.                                                                                                          | `false` |
+| `gatewayAPI.nginx.clientSettingsPolicy.annotations`         | Additional annotations for the ClientSettingsPolicy.                                                                                                                                                | `{}`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.labels`              | Additional labels for the ClientSettingsPolicy.                                                                                                                                                     | `{}`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.clientMaxBodySize`   | ClientMaxBodySize sets the maximum allowed size of the client request body. If not specified, the default of the nginx gateway controller is used.                                                  | `""`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.clientBodyTimeout`   | ClientBodyTimeout sets the timeout for reading the client request body. If not specified, the default of the nginx gateway controller is used.                                                      | `""`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveRequests`   | KeepaliveRequests sets the maximum number of requests that can be served through one keepalive connection. If not specified, the default of the nginx gateway controller is used.                   | `nil`   |
+| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveTime`       | KeepaliveTime sets the time a keepalive connection is kept open. If not specified, the default of the nginx gateway controller is used.                                                             | `""`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveTimeout`    | KeepaliveTimeout sets the time a client has to wait for the response of a request until the connection is closed. If not specified, the default of the nginx gateway controller is used.            | `""`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveMinTimeout` | KeepaliveMinTimeout sets the minimum time a client has to wait for the response of a request until the connection is closed. If not specified, the default of the nginx gateway controller is used. | `""`    |
+
 ### Horizontal Pod Autoscaler (HPA)
 
 | Name              | Description                                                                                        | Value       |
@@ -513,14 +537,14 @@ spec:
 
 ### Ingress
 
-| Name                  | Description                                                                                                          | Value   |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------- | ------- |
-| `ingress.enabled`     | Enable creation of an ingress resource. Requires, that the http service is also enabled.                             | `false` |
-| `ingress.className`   | Ingress class.                                                                                                       | `nginx` |
-| `ingress.annotations` | Additional ingress annotations.                                                                                      | `{}`    |
-| `ingress.labels`      | Additional ingress labels.                                                                                           | `{}`    |
-| `ingress.hosts`       | Ingress specific configuration. Specification only required when another ingress controller is used instead of `t1k. | `[]`    |
-| `ingress.tls`         | Ingress TLS settings. Specification only required when another ingress controller is used instead of `t1k``.         | `[]`    |
+| Name                  | Description                                                                              | Value   |
+| --------------------- | ---------------------------------------------------------------------------------------- | ------- |
+| `ingress.enabled`     | Enable creation of an ingress resource. Requires, that the http service is also enabled. | `false` |
+| `ingress.className`   | Ingress class.                                                                           | `nginx` |
+| `ingress.annotations` | Additional ingress annotations.                                                          | `{}`    |
+| `ingress.labels`      | Additional ingress labels.                                                               | `{}`    |
+| `ingress.hosts`       | Ingress specific configuration.                                                          | `[]`    |
+| `ingress.tls`         | Ingress TLS settings.                                                                    | `[]`    |
 
 ### Persistence
 
@@ -553,48 +577,24 @@ spec:
 | `networkPolicy.egress`      | Concrete egress network policy implementation.                            | `[]`    |
 | `networkPolicy.ingress`     | Concrete ingress network policy implementation.                           | `[]`    |
 
-### GatewayAPI
-
-| Name                                                        | Description                                                                                                                                                                                         | Value   |
-| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `gatewayAPI.enabled`                                        | Enable the Gateway API resources. Requires Kubernetes v1.19 or higher, the CRD's and a compatible gateway controller.                                                                               | `false` |
-| `gatewayAPI.core.backendTLSPolicy.enabled`                  | Enable the BackendTLSPolicy resource. Requires also `gatewayAPI.enabled` to be `true`.                                                                                                              | `false` |
-| `gatewayAPI.core.backendTLSPolicy.annotations`              | Additional annotations for the BackendTLSPolicy.                                                                                                                                                    | `{}`    |
-| `gatewayAPI.core.backendTLSPolicy.labels`                   | Additional labels for the BackendTLSPolicy.                                                                                                                                                         | `{}`    |
-| `gatewayAPI.core.backendTLSPolicy.validation`               | Validation configuration for the BackendTLSPolicy. For example, you can specify a trusted CA certificate to validate the TLS connection between the gateway and the athens-proxy pod.               | `{}`    |
-| `gatewayAPI.core.httpRoute.enabled`                         | Enable the HTTPRoute resource. Requires also `gatewayAPI.enabled` and `services.http.enabled` to be `true`.                                                                                         | `false` |
-| `gatewayAPI.core.httpRoute.annotations`                     | Additional annotations for the HTTPRoute.                                                                                                                                                           | `{}`    |
-| `gatewayAPI.core.httpRoute.labels`                          | Additional labels for the HTTPRoute.                                                                                                                                                                | `{}`    |
-| `gatewayAPI.core.httpRoute.hostnames`                       | Hostnames for the HTTPRoute.                                                                                                                                                                        | `[]`    |
-| `gatewayAPI.core.httpRoute.parentRefs`                      | ParentRefs for the HTTPRoute. You can specify parentRefs to bind the HTTPRoute to specific Gateway resources.                                                                                       | `[]`    |
-| `gatewayAPI.nginx.clientSettingsPolicy.enabled`             | Enable the ClientSettingsPolicy resource. Requires also `gatewayAPI.enabled` to be `true`.                                                                                                          | `false` |
-| `gatewayAPI.nginx.clientSettingsPolicy.annotations`         | Additional annotations for the ClientSettingsPolicy.                                                                                                                                                | `{}`    |
-| `gatewayAPI.nginx.clientSettingsPolicy.labels`              | Additional labels for the ClientSettingsPolicy.                                                                                                                                                     | `{}`    |
-| `gatewayAPI.nginx.clientSettingsPolicy.clientMaxBodySize`   | ClientMaxBodySize sets the maximum allowed size of the client request body. If not specified, the default of the nginx gateway controller is used.                                                  | `""`    |
-| `gatewayAPI.nginx.clientSettingsPolicy.clientBodyTimeout`   | ClientBodyTimeout sets the timeout for reading the client request body. If not specified, the default of the nginx gateway controller is used.                                                      | `""`    |
-| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveRequests`   | KeepaliveRequests sets the maximum number of requests that can be served through one keepalive connection. If not specified, the default of the nginx gateway controller is used.                   | `nil`   |
-| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveTime`       | KeepaliveTime sets the time a keepalive connection is kept open. If not specified, the default of the nginx gateway controller is used.                                                             | `""`    |
-| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveTimeout`    | KeepaliveTimeout sets the time a client has to wait for the response of a request until the connection is closed. If not specified, the default of the nginx gateway controller is used.            | `""`    |
-| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveMinTimeout` | KeepaliveMinTimeout sets the minimum time a client has to wait for the response of a request until the connection is closed. If not specified, the default of the nginx gateway controller is used. | `""`    |
-
 ### Service
 
-| Name                                     | Description                                                                                                                                                                                                | Value       |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `services.http.enabled`                  | Enable the service.                                                                                                                                                                                        | `true`      |
-| `services.http.annotations`              | Additional service annotations.                                                                                                                                                                            | `{}`        |
-| `services.http.externalIPs`              | External IPs for the service.                                                                                                                                                                              | `[]`        |
-| `services.http.externalTrafficPolicy`    | If `service.type` is `NodePort` or `LoadBalancer`, set this to `Local` to tell kube-proxy to only use node local endpoints for cluster external traffic. Furthermore, this enables source IP preservation. | `Cluster`   |
-| `services.http.internalTrafficPolicy`    | If `service.type` is `NodePort` or `LoadBalancer`, set this to `Local` to tell kube-proxy to only use node local endpoints for cluster internal traffic.                                                   | `Cluster`   |
-| `services.http.ipFamilies`               | IPFamilies is list of IP families (e.g. `IPv4`, `IPv6`) assigned to this service. This field is usually assigned automatically based on cluster configuration and only required for customization.         | `[]`        |
-| `services.http.labels`                   | Additional service labels.                                                                                                                                                                                 | `{}`        |
-| `services.http.loadBalancerClass`        | LoadBalancerClass is the class of the load balancer implementation this Service belongs to. Requires service from type `LoadBalancer`.                                                                     | `""`        |
-| `services.http.loadBalancerIP`           | LoadBalancer will get created with the IP specified in this field. Requires service from type `LoadBalancer`.                                                                                              | `""`        |
-| `services.http.loadBalancerSourceRanges` | Source range filter for LoadBalancer. Requires service from type `LoadBalancer`.                                                                                                                           | `[]`        |
-| `services.http.port`                     | Port to forward the traffic to.                                                                                                                                                                            | `3000`      |
-| `services.http.sessionAffinity`          | Supports `ClientIP` and `None`. Enable client IP based session affinity via `ClientIP`.                                                                                                                    | `None`      |
-| `services.http.sessionAffinityConfig`    | Contains the configuration of the session affinity.                                                                                                                                                        | `{}`        |
-| `services.http.type`                     | Kubernetes service type for the traffic.                                                                                                                                                                   | `ClusterIP` |
+| Name                               | Description                                                                                                                                                                                                | Value       |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `service.enabled`                  | Enable the service.                                                                                                                                                                                        | `true`      |
+| `service.annotations`              | Additional service annotations.                                                                                                                                                                            | `{}`        |
+| `service.externalIPs`              | External IPs for the service.                                                                                                                                                                              | `[]`        |
+| `service.externalTrafficPolicy`    | If `service.type` is `NodePort` or `LoadBalancer`, set this to `Local` to tell kube-proxy to only use node local endpoints for cluster external traffic. Furthermore, this enables source IP preservation. | `Cluster`   |
+| `service.internalTrafficPolicy`    | If `service.type` is `NodePort` or `LoadBalancer`, set this to `Local` to tell kube-proxy to only use node local endpoints for cluster internal traffic.                                                   | `Cluster`   |
+| `service.ipFamilies`               | IPFamilies is list of IP families (e.g. `IPv4`, `IPv6`) assigned to this service. This field is usually assigned automatically based on cluster configuration and only required for customization.         | `[]`        |
+| `service.labels`                   | Additional service labels.                                                                                                                                                                                 | `{}`        |
+| `service.loadBalancerClass`        | LoadBalancerClass is the class of the load balancer implementation this Service belongs to. Requires service from type `LoadBalancer`.                                                                     | `""`        |
+| `service.loadBalancerIP`           | LoadBalancer will get created with the IP specified in this field. Requires service from type `LoadBalancer`.                                                                                              | `""`        |
+| `service.loadBalancerSourceRanges` | Source range filter for LoadBalancer. Requires service from type `LoadBalancer`.                                                                                                                           | `[]`        |
+| `service.port`                     | Port to forward the traffic to.                                                                                                                                                                            | `3000`      |
+| `service.sessionAffinity`          | Supports `ClientIP` and `None`. Enable client IP based session affinity via `ClientIP`.                                                                                                                    | `None`      |
+| `service.sessionAffinityConfig`    | Contains the configuration of the session affinity.                                                                                                                                                        | `{}`        |
+| `service.type`                     | Kubernetes service type for the traffic.                                                                                                                                                                   | `ClusterIP` |
 
 ### ServiceAccount
 

@@ -13,7 +13,7 @@ tests:
     gatewayAPI.enabled: false
     gatewayAPI.core.httpRoute.enabled: false
     gatewayAPI.nginx.clientSettingsPolicy.enabled: false
-    services.http.enabled: false
+    service.enabled: false
   asserts:
   - hasDocuments:
       count: 0
@@ -23,7 +23,7 @@ tests:
     gatewayAPI.enabled: true
     gatewayAPI.core.httpRoute.enabled: false
     gatewayAPI.nginx.clientSettingsPolicy.enabled: false
-    services.http.enabled: false
+    service.enabled: false
   asserts:
   - hasDocuments:
       count: 0
@@ -33,7 +33,7 @@ tests:
     gatewayAPI.enabled: false
     gatewayAPI.core.httpRoute.enabled: true
     gatewayAPI.nginx.clientSettingsPolicy.enabled: false
-    services.http.enabled: false
+    service.enabled: false
   asserts:
   - hasDocuments:
       count: 0
@@ -43,7 +43,7 @@ tests:
     gatewayAPI.enabled: false
     gatewayAPI.core.httpRoute.enabled: false
     gatewayAPI.nginx.clientSettingsPolicy.enabled: true
-    services.http.enabled: false
+    service.enabled: false
   asserts:
   - hasDocuments:
       count: 0
@@ -53,7 +53,7 @@ tests:
     gatewayAPI.enabled: false
     gatewayAPI.core.httpRoute.enabled: false
     gatewayAPI.nginx.clientSettingsPolicy.enabled: false
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - hasDocuments:
       count: 0
@@ -63,7 +63,7 @@ tests:
     gatewayAPI.enabled: true
     gatewayAPI.core.httpRoute.enabled: true
     gatewayAPI.nginx.clientSettingsPolicy.enabled: false
-    services.http.enabled: false
+    service.enabled: false
   asserts:
   - hasDocuments:
       count: 0
@@ -73,7 +73,7 @@ tests:
     gatewayAPI.enabled: true
     gatewayAPI.core.httpRoute.enabled: false
     gatewayAPI.nginx.clientSettingsPolicy.enabled: true
-    services.http.enabled: false
+    service.enabled: false
   asserts:
   - hasDocuments:
       count: 0
@@ -83,7 +83,7 @@ tests:
     gatewayAPI.enabled: true
     gatewayAPI.core.httpRoute.enabled: false
     gatewayAPI.nginx.clientSettingsPolicy.enabled: false
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - hasDocuments:
       count: 0
@@ -93,7 +93,7 @@ tests:
     gatewayAPI.enabled: true
     gatewayAPI.core.httpRoute.enabled: true
     gatewayAPI.nginx.clientSettingsPolicy.enabled: true
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - hasDocuments:
       count: 1
@@ -133,7 +133,7 @@ tests:
         foo: "bar"
       labels:
         bar: "foo"
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - equal:
       path: metadata.annotations
@@ -157,7 +157,7 @@ tests:
       enabled: true
       clientMaxBodySize: 10m
       clientBodyTimeout: 30s
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - isSubset:
       path: spec.body
@@ -177,7 +177,7 @@ tests:
       keepaliveTime: 60s
       keepaliveTimeout: 60s
       keepaliveMinTimeout: 10s
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - notExists:
       path: spec.body

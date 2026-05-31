@@ -14,7 +14,7 @@
 {{- define "athens-proxy.backendTLSPolicy.enabled" -}}
 {{- if and .Values.gatewayAPI.enabled
            .Values.gatewayAPI.core.backendTLSPolicy.enabled
-           .Values.services.http.enabled
+           .Values.service.enabled
 -}}
 true
 {{- else -}}

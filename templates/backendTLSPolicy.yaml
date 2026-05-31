@@ -17,7 +17,7 @@ spec:
   targetRefs:
     - group: ""
       kind: Service
-      name: {{ include "athens-proxy.services.http.name" . }}
+      name: {{ include "athens-proxy.service.name" . }}
   {{- with .Values.gatewayAPI.core.backendTLSPolicy.validation }}
   validation:
     {{- toYaml . | nindent 4 }}

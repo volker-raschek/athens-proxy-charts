@@ -15,7 +15,7 @@ tests:
 
 - it: Skip ingress, when service is disabled.
   set:
-    services.http.enabled: false
+    service.enabled: false
     ingress.enabled: true
   asserts:
   - hasDocuments:
@@ -65,7 +65,7 @@ tests:
             pathType: Prefix
             backend:
               service:
-                name: athens-proxy-unittest-http
+                name: athens-proxy-unittest
                 port:
                   number: 3000
   - contains:
@@ -92,7 +92,7 @@ tests:
     - secretName: athens-proxy-http-tls
       hosts:
       - athens-proxy.example.local
-    services.http.port: 8080
+    service.port: 8080
 
   asserts:
   - hasDocuments:
@@ -128,7 +128,7 @@ tests:
             pathType: Prefix
             backend:
               service:
-                name: athens-proxy-unittest-http
+                name: athens-proxy-unittest
                 port:
                   number: 8080
   - contains:

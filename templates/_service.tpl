@@ -2,28 +2,28 @@
 
 {{/* annotations */}}
 
-{{- define "athens-proxy.services.http.annotations" -}}
+{{- define "athens-proxy.service.annotations" -}}
 {{ include "athens-proxy.annotations" . }}
-{{- if .Values.services.http.annotations }}
-{{ toYaml .Values.services.http.annotations }}
+{{- if .Values.service.annotations }}
+{{ toYaml .Values.service.annotations }}
 {{- end }}
 {{- end }}
 
 {{/* labels */}}
 
-{{- define "athens-proxy.services.http.labels" -}}
+{{- define "athens-proxy.service.labels" -}}
 {{ include "athens-proxy.labels" . }}
 {{/* Add label to select the correct service via `selector.matchLabels` of the serviceMonitor resource. */}}
 app.kubernetes.io/service-name: http
-{{- if .Values.services.http.labels }}
-{{ toYaml .Values.services.http.labels }}
+{{- if .Values.service.labels }}
+{{ toYaml .Values.service.labels }}
 {{- end }}
 {{- end }}
 
 {{/* names */}}
 
-{{- define "athens-proxy.services.http.name" -}}
-{{- if .Values.services.http.enabled -}}
+{{- define "athens-proxy.service.name" -}}
+{{- if .Values.service.enabled -}}
 {{ include "athens-proxy.fullname" . }}
 {{- end -}}
 {{- end -}}

@@ -543,7 +543,7 @@ gatewayAPI:
         #   name: "athens-proxy-ca"
         # hostname: "athens-proxy"
 
-    ## @param gatewayAPI.core.httpRoute.enabled Enable the HTTPRoute resource. Requires also `gatewayAPI.enabled` and `services.http.enabled` to be `true`.
+    ## @param gatewayAPI.core.httpRoute.enabled Enable the HTTPRoute resource. Requires also `gatewayAPI.enabled` and `service.enabled` to be `true`.
     ## @param gatewayAPI.core.httpRoute.annotations Additional annotations for the HTTPRoute.
     ## @param gatewayAPI.core.httpRoute.labels Additional labels for the HTTPRoute.
     ## @param gatewayAPI.core.httpRoute.hostnames Hostnames for the HTTPRoute.
@@ -749,36 +749,35 @@ networkPolicy:
   #     protocol: TCP
 
 ## @section Service
-## @param services.http.enabled Enable the service.
-## @param services.http.annotations Additional service annotations.
-## @param services.http.externalIPs External IPs for the service.
-## @param services.http.externalTrafficPolicy If `service.type` is `NodePort` or `LoadBalancer`, set this to `Local` to tell kube-proxy to only use node local endpoints for cluster external traffic. Furthermore, this enables source IP preservation.
-## @param services.http.internalTrafficPolicy If `service.type` is `NodePort` or `LoadBalancer`, set this to `Local` to tell kube-proxy to only use node local endpoints for cluster internal traffic.
-## @param services.http.ipFamilies IPFamilies is list of IP families (e.g. `IPv4`, `IPv6`) assigned to this service. This field is usually assigned automatically based on cluster configuration and only required for customization.
-## @param services.http.labels Additional service labels.
-## @param services.http.loadBalancerClass LoadBalancerClass is the class of the load balancer implementation this Service belongs to. Requires service from type `LoadBalancer`.
-## @param services.http.loadBalancerIP LoadBalancer will get created with the IP specified in this field. Requires service from type `LoadBalancer`.
-## @param services.http.loadBalancerSourceRanges Source range filter for LoadBalancer. Requires service from type `LoadBalancer`.
-## @param services.http.port Port to forward the traffic to.
-## @param services.http.sessionAffinity Supports `ClientIP` and `None`. Enable client IP based session affinity via `ClientIP`.
-## @param services.http.sessionAffinityConfig Contains the configuration of the session affinity.
-## @param services.http.type Kubernetes service type for the traffic.
-services:
-  http:
-    enabled: true
-    annotations: {}
-    externalIPs: []
-    externalTrafficPolicy: "Cluster"
-    internalTrafficPolicy: "Cluster"
-    ipFamilies: []
-    labels: {}
-    loadBalancerClass: ""
-    loadBalancerIP: ""
-    loadBalancerSourceRanges: []
-    port: 3000
-    sessionAffinity: "None"
-    sessionAffinityConfig: {}
-    type: "ClusterIP"
+## @param service.enabled Enable the service.
+## @param service.annotations Additional service annotations.
+## @param service.externalIPs External IPs for the service.
+## @param service.externalTrafficPolicy If `service.type` is `NodePort` or `LoadBalancer`, set this to `Local` to tell kube-proxy to only use node local endpoints for cluster external traffic. Furthermore, this enables source IP preservation.
+## @param service.internalTrafficPolicy If `service.type` is `NodePort` or `LoadBalancer`, set this to `Local` to tell kube-proxy to only use node local endpoints for cluster internal traffic.
+## @param service.ipFamilies IPFamilies is list of IP families (e.g. `IPv4`, `IPv6`) assigned to this service. This field is usually assigned automatically based on cluster configuration and only required for customization.
+## @param service.labels Additional service labels.
+## @param service.loadBalancerClass LoadBalancerClass is the class of the load balancer implementation this Service belongs to. Requires service from type `LoadBalancer`.
+## @param service.loadBalancerIP LoadBalancer will get created with the IP specified in this field. Requires service from type `LoadBalancer`.
+## @param service.loadBalancerSourceRanges Source range filter for LoadBalancer. Requires service from type `LoadBalancer`.
+## @param service.port Port to forward the traffic to.
+## @param service.sessionAffinity Supports `ClientIP` and `None`. Enable client IP based session affinity via `ClientIP`.
+## @param service.sessionAffinityConfig Contains the configuration of the session affinity.
+## @param service.type Kubernetes service type for the traffic.
+service:
+  enabled: true
+  annotations: {}
+  externalIPs: []
+  externalTrafficPolicy: "Cluster"
+  internalTrafficPolicy: "Cluster"
+  ipFamilies: []
+  labels: {}
+  loadBalancerClass: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  port: 3000
+  sessionAffinity: "None"
+  sessionAffinityConfig: {}
+  type: "ClusterIP"
 
 ## @section ServiceAccount
 serviceAccount:

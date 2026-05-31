@@ -12,7 +12,7 @@ tests:
   set:
     gatewayAPI.enabled: false
     gatewayAPI.core.backendTLSPolicy.enabled: false
-    services.http.enabled: false
+    service.enabled: false
   asserts:
   - hasDocuments:
       count: 0
@@ -21,7 +21,7 @@ tests:
   set:
     gatewayAPI.enabled: true
     gatewayAPI.core.backendTLSPolicy.enabled: false
-    services.http.enabled: false
+    service.enabled: false
   asserts:
   - hasDocuments:
       count: 0
@@ -30,7 +30,7 @@ tests:
   set:
     gatewayAPI.enabled: false
     gatewayAPI.core.backendTLSPolicy.enabled: true
-    services.http.enabled: false
+    service.enabled: false
   asserts:
   - hasDocuments:
       count: 0
@@ -39,7 +39,7 @@ tests:
   set:
     gatewayAPI.enabled: false
     gatewayAPI.core.backendTLSPolicy.enabled: false
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - hasDocuments:
       count: 0
@@ -48,7 +48,7 @@ tests:
   set:
     gatewayAPI.enabled: true
     gatewayAPI.core.backendTLSPolicy.enabled: false
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - hasDocuments:
       count: 0
@@ -57,7 +57,7 @@ tests:
   set:
     gatewayAPI.enabled: true
     gatewayAPI.core.backendTLSPolicy.enabled: true
-    services.http.enabled: false
+    service.enabled: false
   asserts:
   - hasDocuments:
       count: 0
@@ -66,7 +66,7 @@ tests:
   set:
     gatewayAPI.enabled: true
     gatewayAPI.core.backendTLSPolicy.enabled: true
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - hasDocuments:
       count: 1
@@ -80,7 +80,7 @@ tests:
       content:
         group: ""
         kind: Service
-        name: athens-proxy-unittest-http
+        name: athens-proxy-unittest
   - notExists:
       path: spec.validation.caCertificateRefs
 
@@ -93,7 +93,7 @@ tests:
         foo: bar
       labels:
         bar: foo
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - equal:
       path: metadata.annotations
@@ -119,7 +119,7 @@ tests:
           kind: Secret
           name: athens-proxy-ca
       hostname: athens-proxy.svc.cluster.local
-    services.http.enabled: true
+    service.enabled: true
   asserts:
   - isSubset:
       path: spec.validation
