@@ -24,6 +24,6 @@ app.kubernetes.io/service-name: http
 
 {{- define "athens-proxy.services.http.name" -}}
 {{- if .Values.services.http.enabled -}}
-{{ include "athens-proxy.fullname" . }}-http
+{{ include "athens-proxy.fullname" . }}
 {{- end -}}
 {{- end -}}

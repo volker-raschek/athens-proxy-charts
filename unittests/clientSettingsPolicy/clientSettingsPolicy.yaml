@@ -1,0 +1,190 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: ClientSettingsPolicy template
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/clientSettingsPolicy.yaml
+tests:
+- it: Skip rendering when disabled 1/8
+  set:
+    gatewayAPI.enabled: false
+    gatewayAPI.core.httpRoute.enabled: false
+    gatewayAPI.nginx.clientSettingsPolicy.enabled: false
+    services.http.enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 2/8
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: false
+    gatewayAPI.nginx.clientSettingsPolicy.enabled: false
+    services.http.enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 3/8
+  set:
+    gatewayAPI.enabled: false
+    gatewayAPI.core.httpRoute.enabled: true
+    gatewayAPI.nginx.clientSettingsPolicy.enabled: false
+    services.http.enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 4/8
+  set:
+    gatewayAPI.enabled: false
+    gatewayAPI.core.httpRoute.enabled: false
+    gatewayAPI.nginx.clientSettingsPolicy.enabled: true
+    services.http.enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 5/8
+  set:
+    gatewayAPI.enabled: false
+    gatewayAPI.core.httpRoute.enabled: false
+    gatewayAPI.nginx.clientSettingsPolicy.enabled: false
+    services.http.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 6/8
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: true
+    gatewayAPI.nginx.clientSettingsPolicy.enabled: false
+    services.http.enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 7/8
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: false
+    gatewayAPI.nginx.clientSettingsPolicy.enabled: true
+    services.http.enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 8/8
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: false
+    gatewayAPI.nginx.clientSettingsPolicy.enabled: false
+    services.http.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Render default values
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: true
+    gatewayAPI.nginx.clientSettingsPolicy.enabled: true
+    services.http.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: gateway.nginx.org/v1alpha1
+      kind: ClientSettingsPolicy
+      name: athens-proxy-unittest
+      namespace: testing
+  - notExists:
+      path: metadata.annotations
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+  - isSubset:
+      path: spec.targetRef
+      content:
+        group: gateway.networking.k8s.io
+        kind: HTTPRoute
+        name: athens-proxy-unittest
+  - notExists:
+      path: spec.body
+  - notExists:
+      path: spec.keepAlive
+
+- it: Render custom annotations and labels
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: true
+    gatewayAPI.nginx.clientSettingsPolicy:
+      enabled: true
+      annotations:
+        foo: "bar"
+      labels:
+        bar: "foo"
+    services.http.enabled: true
+  asserts:
+  - equal:
+      path: metadata.annotations
+      value:
+        foo: "bar"
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+        bar: "foo"
+
+- it: Render with custom body settings
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: true
+    gatewayAPI.nginx.clientSettingsPolicy:
+      enabled: true
+      clientMaxBodySize: 10m
+      clientBodyTimeout: 30s
+    services.http.enabled: true
+  asserts:
+  - isSubset:
+      path: spec.body
+      content:
+        maxSize: 10m
+        timeout: 30s
+  - notExists:
+      path: spec.keepAlive
+
+- it: Render with custom keepAlive settings
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: true
+    gatewayAPI.nginx.clientSettingsPolicy:
+      enabled: true
+      keepaliveRequests: 100
+      keepaliveTime: 60s
+      keepaliveTimeout: 60s
+      keepaliveMinTimeout: 10s
+    services.http.enabled: true
+  asserts:
+  - notExists:
+      path: spec.body
+  - isSubset:
+      path: spec.keepAlive
+      content:
+        requests: 100
+        time: 60s
+        timeout: 60s
+        minTimeout: 10s

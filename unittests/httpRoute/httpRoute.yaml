@@ -1,0 +1,194 @@
+chart:
+  appVersion: 0.1.0
+  version: 0.1.0
+suite: HTTPRoute template
+release:
+  name: athens-proxy-unittest
+  namespace: testing
+templates:
+- templates/httpRoute.yaml
+tests:
+- it: Skip rendering when disabled 1/6
+  set:
+    gatewayAPI.enabled: false
+    gatewayAPI.core.httpRoute.enabled: false
+    services.http.enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 2/6
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: false
+    services.http.enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 3/6
+  set:
+    gatewayAPI.enabled: false
+    gatewayAPI.core.httpRoute.enabled: true
+    services.http.enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 4/6
+  set:
+    gatewayAPI.enabled: false
+    gatewayAPI.core.httpRoute.enabled: false
+    services.http.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 5/6
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: false
+    services.http.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Skip rendering when disabled 6/6
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: true
+    services.http.enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: Rendering default values
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: true
+    services.http.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 1
+  - containsDocument:
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      name: athens-proxy-unittest
+      namespace: testing
+  - notExists:
+      path: metadata.annotations
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        helm.sh/chart: athens-proxy-0.1.0
+  - notExists:
+      path: spec.hostnames
+  - notExists:
+      path: spec.parentRefs
+  - contains:
+      path: spec.rules[0].backendRefs
+      content:
+        kind: Service
+        name: athens-proxy-unittest-http
+        namespace: testing
+        port: 3000
+        weight: 1
+  - contains:
+      path: spec.rules[0].matches
+      content:
+        path:
+          type: PathPrefix
+          value: /
+
+- it: Rendering custom annotations and labels
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute:
+      enabled: true
+      annotations:
+        foo: bar
+      labels:
+        bar: foo
+    services.http.enabled: true
+  asserts:
+  - hasDocuments:
+      count: 1
+  - equal:
+      path: metadata.annotations
+      value:
+        foo: bar
+  - equal:
+      path: metadata.labels
+      value:
+        app.kubernetes.io/instance: athens-proxy-unittest
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: athens-proxy
+        app.kubernetes.io/version: 0.1.0
+        bar: foo
+        helm.sh/chart: athens-proxy-0.1.0
+
+- it: Rendering custom service port
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute.enabled: true
+    services.http:
+      enabled: true
+      port: 9090
+  asserts:
+  - equal:
+      path: spec.rules[0].backendRefs[0].port
+      value: 9090
+
+- it: Rendering custom matches
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute:
+      enabled: true
+      matches:
+      - path:
+          type: PathPrefix
+          value: /foo
+    services.http.enabled: true
+  asserts:
+  - contains:
+      path: spec.rules[0].matches
+      content:
+        path:
+          type: PathPrefix
+          value: /foo
+
+- it: Rendering custom hostnames and parentRefs
+  set:
+    gatewayAPI.enabled: true
+    gatewayAPI.core.httpRoute:
+      enabled: true
+      hostnames:
+      - athens-proxy.example.local
+      parentRefs:
+      - name: gateway
+        namespace: testing
+        kind: Gateway
+        sectionName: athens-proxy-debug-gateway
+    services.http.enabled: true
+  asserts:
+  - lengthEqual:
+      path: spec.hostnames
+      count: 1
+  - contains:
+      path: spec.hostnames
+      content:
+        athens-proxy.example.local
+  - lengthEqual:
+      path: spec.parentRefs
+      count: 1
+  - contains:
+      path: spec.parentRefs
+      content:
+        name: gateway
+        namespace: testing
+        kind: Gateway
+        sectionName: athens-proxy-debug-gateway

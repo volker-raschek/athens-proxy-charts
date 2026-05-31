@@ -1,0 +1,50 @@
+{{- if eq (include "athens-proxy.clientSettingsPolicy.enabled" $) "true" }}
+apiVersion: gateway.nginx.org/v1alpha1
+kind: ClientSettingsPolicy
+metadata:
+  {{- with (include "athens-proxy.clientSettingsPolicy.annotations" . | fromYaml) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with (include "athens-proxy.clientSettingsPolicy.labels" . | fromYaml) }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ include "athens-proxy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: {{ include "athens-proxy.fullname" . }}
+  {{- if or .Values.gatewayAPI.nginx.clientSettingsPolicy.clientMaxBodySize
+            .Values.gatewayAPI.nginx.clientSettingsPolicy.clientBodyTimeout
+  }}
+  body:
+    {{- with .Values.gatewayAPI.nginx.clientSettingsPolicy.clientMaxBodySize }}
+    maxSize: {{ . }}
+    {{- end }}
+    {{- with .Values.gatewayAPI.nginx.clientSettingsPolicy.clientBodyTimeout }}
+    timeout: {{ . }}
+    {{- end }}
+  {{- end }}
+  {{- if or .Values.gatewayAPI.nginx.clientSettingsPolicy.keepaliveRequests
+            .Values.gatewayAPI.nginx.clientSettingsPolicy.keepaliveTime
+            .Values.gatewayAPI.nginx.clientSettingsPolicy.keepaliveTimeout
+            .Values.gatewayAPI.nginx.clientSettingsPolicy.keepaliveMinTimeout
+  }}
+  keepAlive:
+    {{- with .Values.gatewayAPI.nginx.clientSettingsPolicy.keepaliveRequests }}
+    requests: {{ . }}
+    {{- end }}
+    {{- with .Values.gatewayAPI.nginx.clientSettingsPolicy.keepaliveTime }}
+    time: {{ . }}
+    {{- end }}
+    {{- with .Values.gatewayAPI.nginx.clientSettingsPolicy.keepaliveTimeout }}
+    timeout: {{ . }}
+    {{- end }}
+    {{- with .Values.gatewayAPI.nginx.clientSettingsPolicy.keepaliveMinTimeout }}
+    minTimeout: {{ . }}
+    {{- end }}
+  {{- end }}
+{{- end -}}

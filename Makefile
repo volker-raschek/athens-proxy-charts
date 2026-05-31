@@ -18,6 +18,25 @@ NODE_IMAGE_FULLY_QUALIFIED=${NODE_IMAGE_REGISTRY_HOST}/${NODE_IMAGE_REPOSITORY}:
 missing-dot:
 	grep --perl-regexp '## @(param|skip).*[^.]$$' values.yaml
 
+# README
+# ==============================================================================
+readme: readme/link readme/lint readme/parameters
+
+readme/link:
+	npm install && npm run readme:link
+
+readme/lint:
+	npm install && npm run readme:lint
+
+readme/parameters:
+	npm install && npm run readme:parameters
+
+# HELM UNITTESTS
+# ==============================================================================
+PHONY+=helm/unittest
+helm/unittest:
+	helm unittest --strict --file 'unittests/**/*.yaml' ./
+
 # CONTAINER RUN - README
 # ==============================================================================
 PHONY+=container-run/readme

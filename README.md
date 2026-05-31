@@ -96,6 +96,10 @@ certificate can be used the [cert-manager](https://cert-manager.io/). The chart 
 certificate via `cert-manager.io/v1 Certificate` resource. Alternatively can be mounted a TLS certificate from a secret.
 The secret must be from type `kubernetes.io/tls`.
 
+If athens-proxy is deployed behind a reverse proxy, for example an ingress nginx controller or Gateway API, please
+instruct the reverse proxy to establish a TLS encrypted connection to avoid connection problems. The documentation
+describes configuring [Ingress NGINX](#ingress-nginx) as well as [NGINX Gateway Fabric](#gatewayapi-nginx-fabric).
+
 > [!WARNING]
 > The following example expects that the [cert-manager](https://cert-manager.io/) is deployed and the `Issuer` named
 > `athens-proxy-ca` is present in the same namespace of the helm deployment.
@@ -110,6 +114,110 @@ helm install --version "${CHART_VERSION}" athens-proxy volker.raschek/athens-pro
 
 The environment variables `ATHENS_TLSCERT_FILE` and `ATHENS_TLSKEY_FILE` are automatically added and the TLS certificate
 and private key are mounted to a pre-defined destination inside the container file system.
+
+##### Ingress NGINX
+
+The following changes must be applied to enable TLS encryption and authentication on-top between the ingress and backend
+service.
+
+> [!IMPORTANT]
+> The HTTP Version between the ingress nginx and backend must be set to `1.1`, as well as the TLS protocol must be set
+> to `TLSv1.2`. Otherwise can't the nginx establish a TLS connection.
+
+The secret `athens-proxy/ingress-nginx-controller-tls` contains TLS certificates for the nginx ingress controller. The
+TLS certificate must be created manually, for example via [cert-manager](https://cert-manager.io/). It is used by the
+nginx for TLS authentication.
+
+```yaml
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/proxy-ssl-secret: athens-proxy/ingress-nginx-controller-tls
+    nginx.ingress.kubernetes.io/proxy-ssl-protocols: TLSv1.2
+    nginx.ingress.kubernetes.io/proxy-ssl-name: athens-proxy
+    nginx.ingress.kubernetes.io/proxy-ssl-verify: "on"
+```
+
+##### GatewayAPI: NGINX Fabric
+
+The following changes must be applied to enable TLS encryption and authentication on-top between the gateway and backend
+service.
+
+> [!IMPORTANT]
+> The HTTP Version between the nginx gateway fabric and backend must be set to `1.1`, as well as the TLS protocol must
+> be set to `TLSv1.2`. Otherwise can't the nginx establish a TLS connection.
+
+The `gatewayAPI.core.backendTLSPolicy.validation.caCertificateRefs` must contain at least one secret containing the
+root or intermediate certificate of the issued TLS certificate used by athens-proxy to be able to validate the TLS
+certificate.
+
+```yaml
+gatewayAPI:
+  enabled: true
+  core:
+    backendTLSPolicy:
+      enabled: true
+      validation:
+        caCertificateRefs:
+        - group: ""
+          kind: Secret
+          name: "athens-proxy-ca"
+        hostname: "athens-proxy"
+
+    httpRoute:
+      enabled: true
+      hostnames:
+      - athens-proxy.example.local
+      parentRefs:
+      - name: nginx
+        kind: Gateway
+        group: gateway.networking.k8s.io
+        namespace: my-gateway-namespace
+        sectionName: athens-proxy-https
+```
+
+The Gateway resource is not part of the helm chart, but for illustrating the configuration example, here a GatewayAPI
+resource with configured backend TLS certificate. The TLS certificates `gateway-frontend-tls` and `gateway-backend-tls`
+must also be created manually, for example via [cert-manager](https://cert-manager.io/).
+
+```yaml
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: nginx
+  namespace: my-gateway-namespace
+spec:
+  gatewayClassName: nginx
+  listeners:
+    - allowedRoutes:
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
+        namespaces:
+          from: All
+      hostname: athens-proxy.example.local
+      name: https
+      port: 443
+      protocol: HTTPS
+      tls:
+        certificateRefs:
+          - group: ''
+            kind: Secret
+            name: gateway-frontend-tls
+            namespace: my-gateway-namespace
+        mode: Terminate
+  tls:
+    backend:
+      clientCertificateRef:
+        group: ''
+        kind: Secret
+        name: gateway-backend-tls
+        namespace: my-gateway-namespace
+```
 
 #### TLS certificate rotation
 
@@ -198,6 +306,13 @@ networkPolicies:
       podSelector:
         matchLabels:
           app.kubernetes.io/name: ingress-nginx
+    # NGINX GatewayAPI Fabric
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: gateway-nginx
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: gateway-nginx
     ports:
     - port: http
       protocol: TCP
@@ -437,6 +552,30 @@ spec:
 | `networkPolicy.policyTypes` | List of policy types. Supported is ingress, egress or ingress and egress. | `[]`    |
 | `networkPolicy.egress`      | Concrete egress network policy implementation.                            | `[]`    |
 | `networkPolicy.ingress`     | Concrete ingress network policy implementation.                           | `[]`    |
+
+### GatewayAPI
+
+| Name                                                        | Description                                                                                                                                                                                         | Value   |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `gatewayAPI.enabled`                                        | Enable the Gateway API resources. Requires Kubernetes v1.19 or higher, the CRD's and a compatible gateway controller.                                                                               | `false` |
+| `gatewayAPI.core.backendTLSPolicy.enabled`                  | Enable the BackendTLSPolicy resource. Requires also `gatewayAPI.enabled` to be `true`.                                                                                                              | `false` |
+| `gatewayAPI.core.backendTLSPolicy.annotations`              | Additional annotations for the BackendTLSPolicy.                                                                                                                                                    | `{}`    |
+| `gatewayAPI.core.backendTLSPolicy.labels`                   | Additional labels for the BackendTLSPolicy.                                                                                                                                                         | `{}`    |
+| `gatewayAPI.core.backendTLSPolicy.validation`               | Validation configuration for the BackendTLSPolicy. For example, you can specify a trusted CA certificate to validate the TLS connection between the gateway and the athens-proxy pod.               | `{}`    |
+| `gatewayAPI.core.httpRoute.enabled`                         | Enable the HTTPRoute resource. Requires also `gatewayAPI.enabled` and `services.http.enabled` to be `true`.                                                                                         | `false` |
+| `gatewayAPI.core.httpRoute.annotations`                     | Additional annotations for the HTTPRoute.                                                                                                                                                           | `{}`    |
+| `gatewayAPI.core.httpRoute.labels`                          | Additional labels for the HTTPRoute.                                                                                                                                                                | `{}`    |
+| `gatewayAPI.core.httpRoute.hostnames`                       | Hostnames for the HTTPRoute.                                                                                                                                                                        | `[]`    |
+| `gatewayAPI.core.httpRoute.parentRefs`                      | ParentRefs for the HTTPRoute. You can specify parentRefs to bind the HTTPRoute to specific Gateway resources.                                                                                       | `[]`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.enabled`             | Enable the ClientSettingsPolicy resource. Requires also `gatewayAPI.enabled` to be `true`.                                                                                                          | `false` |
+| `gatewayAPI.nginx.clientSettingsPolicy.annotations`         | Additional annotations for the ClientSettingsPolicy.                                                                                                                                                | `{}`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.labels`              | Additional labels for the ClientSettingsPolicy.                                                                                                                                                     | `{}`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.clientMaxBodySize`   | ClientMaxBodySize sets the maximum allowed size of the client request body. If not specified, the default of the nginx gateway controller is used.                                                  | `""`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.clientBodyTimeout`   | ClientBodyTimeout sets the timeout for reading the client request body. If not specified, the default of the nginx gateway controller is used.                                                      | `""`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveRequests`   | KeepaliveRequests sets the maximum number of requests that can be served through one keepalive connection. If not specified, the default of the nginx gateway controller is used.                   | `nil`   |
+| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveTime`       | KeepaliveTime sets the time a keepalive connection is kept open. If not specified, the default of the nginx gateway controller is used.                                                             | `""`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveTimeout`    | KeepaliveTimeout sets the time a client has to wait for the response of a request until the connection is closed. If not specified, the default of the nginx gateway controller is used.            | `""`    |
+| `gatewayAPI.nginx.clientSettingsPolicy.keepaliveMinTimeout` | KeepaliveMinTimeout sets the minimum time a client has to wait for the response of a request until the connection is closed. If not specified, the default of the nginx gateway controller is used. | `""`    |
 
 ### Service
 
