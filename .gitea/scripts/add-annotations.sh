@@ -8,9 +8,11 @@ if [ ! -f "${CHART_FILE}" ]; then
   exit 1
 fi
 
+rc_pattern='-rc(\.[0-9]+)?$'
+
 # Exclude prerelease tags (matching -rc or -rc-<digits>) from default tag selection
-DEFAULT_NEW_TAG="$(git tag --sort=-version:refname | grep --invert-match --perl-regexp '\-rc(-[0-9]+)?$' | head --lines 1)"
-DEFAULT_OLD_TAG="$(git tag --sort=-version:refname | grep --invert-match --perl-regexp '\-rc(-[0-9]+)?$' | head --lines 2 | tail --lines 1)"
+DEFAULT_NEW_TAG="$(git tag --sort=-version:refname | grep --invert-match --perl-regexp "${rc_pattern}" | head --lines 1)"
+DEFAULT_OLD_TAG="$(git tag --sort=-version:refname | grep --invert-match --perl-regexp "${rc_pattern}" | head --lines 2 | tail --lines 1)"
 
 if [ -z "${1}" ]; then
   read -p "Enter start tag [${DEFAULT_OLD_TAG}]: " OLD_TAG
@@ -56,7 +58,7 @@ else
 fi
 
 # Check if NEW_TAG is a prerelease (matches -rc or -rc-<digits> suffix)
-if [[ "${NEW_TAG}" =~ -rc(-[0-9]+)?$ ]]; then
+if [[ "${NEW_TAG}" =~ ${rc_pattern} ]]; then
   echo "INFO: Tag '${NEW_TAG}' is a prerelease, setting prerelease annotation and skipping changelog."
   yq --no-colors --inplace ".annotations.\"artifacthub.io/prerelease\" = \"true\" | sort_keys(.)" "${CHART_FILE}"
   exit 0
