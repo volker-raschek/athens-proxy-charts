@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eo pipefail
 
 CHART_FILE="Chart.yaml"
 if [ ! -f "${CHART_FILE}" ]; then

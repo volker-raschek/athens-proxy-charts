@@ -71,8 +71,9 @@ jobs:
 
       - name: Add Artifacthub.io annotations
         run: |
-          NEW_TAG="$(git tag --sort=-version:refname | head -n 1)"
-          OLD_TAG="$(git tag --sort=-version:refname | head -n 2 | tail -n 1)"
+          rc_pattern="\-rc([-\.][0-9]+)?$"
+          NEW_TAG="$(git tag --sort=-version:refname | grep --invert-match --perl-regexp "${rc_pattern}" | head --lines 1)"
+          OLD_TAG="$(git tag --sort=-version:refname | grep --invert-match --perl-regexp "${rc_pattern}" | head --lines 2 | tail --lines 1)"
           .gitea/scripts/add-annotations.sh "${OLD_TAG}" "${NEW_TAG}"
 
       - name: Extract meta information
