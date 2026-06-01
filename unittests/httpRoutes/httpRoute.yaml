@@ -92,6 +92,7 @@ tests:
   - contains:
       path: spec.rules[0].backendRefs
       content:
+        group: ''
         kind: Service
         name: athens-proxy-unittest
         namespace: testing

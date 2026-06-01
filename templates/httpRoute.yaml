@@ -24,7 +24,8 @@ spec:
   {{- end }}
   rules:
     - backendRefs:
-        - kind: Service
+        - group: ''
+          kind: Service
           name: {{ include "athens-proxy.service.name" . }}
           namespace: {{ .Release.Namespace }}
           port: {{ .Values.service.port }}
