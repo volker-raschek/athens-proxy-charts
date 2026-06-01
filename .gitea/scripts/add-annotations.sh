@@ -8,9 +8,9 @@ if [ ! -f "${CHART_FILE}" ]; then
   exit 1
 fi
 
-rc_pattern='-rc(\.[0-9]+)?$'
+rc_pattern="\-rc([-\.][0-9]+)?$"
 
-# Exclude prerelease tags (matching -rc or -rc-<digits>) from default tag selection
+# Exclude prerelease tags (matching -rc or -rc.<digits>) from default tag selection
 DEFAULT_NEW_TAG="$(git tag --sort=-version:refname | grep --invert-match --perl-regexp "${rc_pattern}" | head --lines 1)"
 DEFAULT_OLD_TAG="$(git tag --sort=-version:refname | grep --invert-match --perl-regexp "${rc_pattern}" | head --lines 2 | tail --lines 1)"
 
