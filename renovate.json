@@ -14,7 +14,7 @@
         "^Chart\\.yaml$"
       ],
       "matchStrings": [
-        "appVersion: \"(?<currentValue>.*?)\"\\s+"
+        "^appVersion: \"?(?<currentValue>.*)\"?"
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "gomods/athens",
@@ -23,9 +23,11 @@
     },
     {
       "customType": "regex",
-      "fileMatch": ["^README\\.md$"],
+      "fileMatch": [
+        "^README\\.md$"
+      ],
       "matchStrings": [
-        "VERSION=(?<currentValue>.*)"
+        "CHART_VERSION=(?<currentValue>.*)"
       ],
       "depNameTemplate": "volker.raschek/athens-proxy-charts",
       "packageNameTemplate": "https://git.cryptic.systems/volker.raschek/athens-proxy-charts",
@@ -44,6 +46,20 @@
     }
   ],
   "packageRules": [
+    {
+      "automerge": true,
+      "groupName": "Update helm plugin 'unittest'",
+      "matchDepNames": [
+        "helm-unittest/helm-unittest"
+      ],
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ]
+    },
     {
       "groupName": "Update docker.io/library/node",
       "matchDepNames": [
@@ -83,5 +99,16 @@
         "patch"
       ]
     }
-  ]
+  ],
+  "postUpgradeTasks": {
+    "commands": [
+      "install-tool node",
+      "make readme"
+    ],
+    "fileFilters": [
+      "README.md",
+      "values.yaml"
+    ],
+    "executionMode": "update"
+  }
 }
