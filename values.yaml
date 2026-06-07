@@ -615,6 +615,7 @@ hpa:
   #     target:
   #       averageUtilization: 65
   #       type: Utilization
+  #   type: Resource
   minReplicas: 1
   maxReplicas: 10
 
@@ -700,7 +701,13 @@ networkPolicy:
   #   - port: 22
   #     protocol: TCP
 
-  # Allow outgoing HTTPS traffic to external go module servers
+  # Allow outgoing traffic to HTTP severs
+  #
+  # - ports:
+  #   - port: 80
+  #     protocol: TCP
+
+  # Allow outgoing traffic to HTTPS severs
   #
   # - ports:
   #   - port: 443
@@ -735,7 +742,7 @@ networkPolicy:
   #   - port: http
   #     protocol: TCP
 
-  # Allow incoming HTTP traffic from ingress-nginx.
+  # Allow incoming HTTP traffic from ingress-nginx or gateway-api.
   #
   # - from:
   #   - namespaceSelector:
@@ -747,6 +754,17 @@ networkPolicy:
   #   ports:
   #   - port: http
   #     protocol: TCP
+
+  # - from:
+  #  - namespaceSelector:
+  #      matchLabels:
+  #        kubernetes.io/metadata.name: gateway-api
+  #    podSelector:
+  #      matchLabels:
+  #        gateway.networking.k8s.io/gateway-name: nginx
+  #  ports:
+  #  - port: http
+  #    protocol: TCP
 
 ## @section Service
 ## @param service.enabled Enable the service.
