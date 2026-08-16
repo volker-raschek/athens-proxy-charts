@@ -69,8 +69,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Add Artifacthub.io annotations
-        uses: volker-raschek/ah-annotations@v0.1.1
+      - uses: volker-raschek/ah-annotations@v0.1.2
 
       - name: Extract meta information
         run: |
