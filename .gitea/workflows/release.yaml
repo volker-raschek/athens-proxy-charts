@@ -122,7 +122,7 @@ jobs:
               --fail \
               --show-error \
               --request POST \
-              --user "${CHARTMUSEUM_USERNAME}:${CHARTMUSEUM_PASSWORD}" \
+              --user "${REPOSITORY_OWNER}:${GITEA_REGISTRY_TOKEN}" \
               --upload-file "${REPOSITORY_NAME}-${PACKAGE_VERSION}.tgz.prov" \
                 https://${GITEA_SERVER_HOSTNAME}/api/packages/${REPOSITORY_OWNER}/helm/api/prov
           fi
