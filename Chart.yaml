@@ -12,7 +12,7 @@ annotations:
     fingerprint: 3B0CE9853CAD76076260025383D342258456906E
     url: https://keys.openpgp.org/vks/v1/by-fingerprint/3B0CE9853CAD76076260025383D342258456906E
 apiVersion: v2
-appVersion: v0.17.1
+appVersion: v0.19.2
 description: Athens proxy server for golang
 icon: https://github.com/gomods/athens/blob/main/docs/static/banner.png?raw=true
 keywords:
