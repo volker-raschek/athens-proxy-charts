@@ -130,6 +130,9 @@ tests:
       path: spec.template.spec.imagePullSecrets
     template: templates/deployment.yaml
   - notExists:
+      path: spec.template.spec.initContainers
+    template: templates/deployment.yaml
+  - notExists:
       path: spec.template.spec.nodeSelector
     template: templates/deployment.yaml
   - notExists:
@@ -461,6 +464,22 @@ tests:
       value:
       - name: my-pull-secret
       - name: my-special-secret
+    template: templates/deployment.yaml
+
+- it: Test initContainers
+  set:
+    # Ensure that the secrets and config maps are well configured.
+
+    # Normal test values
+    deployment.initContainers:
+    - name: busybox
+      image: docker.io/library/busybox:latest
+  asserts:
+  - contains:
+      path: spec.template.spec.initContainers
+      content:
+        name: busybox
+        image: docker.io/library/busybox:latest
     template: templates/deployment.yaml
 
 - it: Test nodeSelector
