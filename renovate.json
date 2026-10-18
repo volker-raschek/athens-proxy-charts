@@ -15,7 +15,7 @@
         "^Chart\\.yaml$"
       ],
       "matchStrings": [
-        "^appVersion: \"?(?<currentValue>.*)\"?"
+        "appVersion: \"(?<currentValue>.*?)\"\\s+"
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "gomods/athens",
@@ -24,9 +24,7 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^README\\.md$"
-      ],
+      "fileMatch": ["^README\\.md$"],
       "matchStrings": [
         "CHART_VERSION=(?<currentValue>.*)"
       ],
